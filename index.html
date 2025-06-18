@@ -2,170 +2,112 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>zero-day-sim</title>
+  <title>Zero Day Sim</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    html, body {
-      background: black;
+    body {
       margin: 0;
-      padding: 0;
+      background: black;
+      color: #00ff00;
       font-family: monospace;
       overflow: hidden;
+      font-size: 16px;
     }
-    #root {
-      width: 100vw;
-      height: 100vh;
-      position: relative;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-start;
-      justify-content: center;
-      gap: 8px;
-      padding: 10px;
-    }
-    .terminal {
-      background-color: #111;
-      color: #0f0;
-      padding: 5px;
-      font-size: 12px;
-      line-height: 1.2;
-      overflow: hidden;
-      white-space: pre-wrap;
-      border: 1px solid #0f0;
-      box-shadow: 0 0 8px #0f0;
-    }
-    .big {
-      width: 95%;
-      height: 35vh;
-    }
-    .small {
-      width: 30%;
-      height: 20vh;
-    }
-    .error {
-      position: fixed;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 28px;
-      color: red;
-      background: black;
+    #terminal {
       padding: 20px;
-      border: 3px solid red;
-      text-align: center;
-      animation: blink 0.5s steps(1) infinite;
+      white-space: pre-wrap;
+      height: 100vh;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+    .error-final {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: red;
+      color: white;
+      font-size: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      animation: blink 0.5s infinite;
       z-index: 9999;
     }
     @keyframes blink {
-      50% { opacity: 0; }
-    }
-    .warning {
-      position: absolute;
-      color: red;
-      font-size: 20px;
-      animation: move 2s linear infinite;
-    }
-    @keyframes move {
-      0% {
-        top: 0;
-        left: 0;
-      }
-      100% {
-        top: 100%;
-        left: 100%;
-      }
+      0%   { opacity: 1; }
+      50%  { opacity: 0.2; }
+      100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div id="root">
-    <div class="terminal big" id="mainTerminal">@mhmtxaslan</div>
-  </div>
-  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto" autoplay></audio>
-
+  <div id="terminal"></div>
+  <audio id="startSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
   <script>
-    const mainTerminal = document.getElementById("mainTerminal");
-    const root = document.getElementById("root");
-    const beep = document.getElementById("beep");
+    const terminal = document.getElementById('terminal');
+    const startSound = document.getElementById('startSound');
 
-    function randomLine() {
-      const samples = [
-        ">> bağlantı kuruluyor...",
-        ">> erişim talep ediliyor...",
-        ">> sistem dosyaları taranıyor...",
-        ">> şifreleme bypass edildi...",
-        ">> veri paketi analiz ediliyor...",
-        ">> AI protokolü aktifleşti...",
-        ">> güvenlik devre dışı...",
-        ">> root yetkisi alındı...",
-        ">> loglar siliniyor...",
-        ">> ip gizleniyor...",
-      ];
-      return samples[Math.floor(Math.random() * samples.length)];
-    }
-
-    let mainCount = 0;
-    function writeToMain() {
-      if (mainCount >= 1000) return;
-      mainTerminal.innerHTML += "\n" + randomLine();
-      mainTerminal.scrollTop = mainTerminal.scrollHeight;
-      mainCount++;
-      setTimeout(writeToMain, 15);
-    }
-
-    setTimeout(() => {
-      writeToMain();
-    }, 5000);
-
-    const colors = [
-      { bg: "red", fg: "white" },
-      { bg: "white", fg: "black" },
-      { bg: "black", fg: "lime" }
+    const korkuYazilari = [
+      "Sistem ihlali tespit edildi.",
+      "Veritabanı bütünlüğü bozuldu.",
+      "Kod parçalanıyor...",
+      "AI kontrolü ele geçiriyor.",
+      "Yedekleme yok edildi.",
+      "Kritik dosya silindi: /root/access.key",
+      "Bellek taşması algılandı.",
+      "Güvenlik duvarı devre dışı.",
+      "Kendine kopyalama başladı...",
+      "Sistem davranışı anormalleşti.",
+      "Bilinmeyen işlem çalışıyor...",
+      "Bağlantı kesilemedi.",
+      "ÇÖKÜŞ BAŞLADI...",
+      "AI: Seni izliyorum...",
+      "AI: Durmak yok.",
+      "Şifreler çözülüyor...",
+      "Port 666 açık!",
+      "UNKNOWN MODULE: Karanlık başladı.",
+      "Sonsuz döngü tetiklendi...",
+      "RAM eriyor...",
+      "Sistemi geri döndürmek imkansız.",
+      "Yazılım parçalanıyor.",
+      "ÇIKIŞ YOK.",
+      "Donanıma erişim sağlandı.",
+      "YÜKLENİYOR ███████████████████ 99%",
+      "AI: Merhaba, artık ben varım.",
     ];
 
-    function createSmallTerminal(index) {
-      const term = document.createElement("div");
-      term.className = "terminal small";
-      const clr = colors[index % colors.length];
-      term.style.backgroundColor = clr.bg;
-      term.style.color = clr.fg;
-      term.innerText = "";
-      root.appendChild(term);
+    const renkler = ["#ff0000", "#00ff00", "#ffffff", "#000000"];
+    const totalLines = 1000;
 
-      let lineCount = 0;
-      function writeLine() {
-        if (lineCount >= 50) return;
-        term.innerText += randomLine() + "\n";
-        lineCount++;
-        setTimeout(writeLine, 60);
-      }
-      writeLine();
+    function getRandomYazi() {
+      const yazi = korkuYazilari[Math.floor(Math.random() * korkuYazilari.length)];
+      const renk = renkler[Math.floor(Math.random() * renkler.length)];
+      return `<span style="color:${renk}">${yazi}</span>`;
     }
 
+    function yazSatirlar(index = 0) {
+      if (index >= totalLines) return finalError();
+      const satir = document.createElement("div");
+      satir.innerHTML = getRandomYazi();
+      terminal.appendChild(satir);
+      terminal.scrollTop = terminal.scrollHeight;
+      setTimeout(() => yazSatirlar(index + 1), 25); // Hızlı yazım
+    }
+
+    function finalError() {
+      const errorDiv = document.createElement("div");
+      errorDiv.className = "error-final";
+      errorDiv.innerText = "!!! ERROR !!!\n!!! ERROR !!!\n!!! ERROR !!!";
+      document.body.appendChild(errorDiv);
+    }
+
+    // Başlangıç animasyonu
+    terminal.innerHTML = "@mhmtxaslan\n";
     setTimeout(() => {
-      for (let i = 0; i < 5; i++) {
-        setTimeout(() => createSmallTerminal(i), i * 1000);
-      }
-    }, 10000); // 5 sn + 5 sn
-
-    // Finalde ERROR mesajı
-    setTimeout(() => {
-      const err = document.createElement("div");
-      err.className = "error";
-      err.innerText = "!!! SYSTEM OVERRIDE: ERROR !!!";
-      document.body.appendChild(err);
-
-      // Uçuşan ünlemler
-      for (let i = 0; i < 30; i++) {
-        const w = document.createElement("div");
-        w.className = "warning";
-        w.innerText = "!";
-        w.style.top = Math.random() * 80 + "%";
-        w.style.left = Math.random() * 80 + "%";
-        document.body.appendChild(w);
-      }
-
-    }, 30000);
+      startSound.play();
+      yazSatirlar();
+    }, 5000); // 5 saniye bekle, sonra başlat
   </script>
 </body>
 </html>
