@@ -53,7 +53,7 @@
     font-size: 16px;
     line-height: 1.2;
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     color: transparent;
   }
   /* 3 renkli kolon düzeni */
@@ -116,18 +116,18 @@
 </head>
 <body>
 
-<div id="start-box">
+<div id="start-box" role="button" aria-label="Başlat">
   <span>█ mhmtxaslan █</span>
   <button id="close-btn" title="Başlat (Ses Aç)">✕</button>
 </div>
 
-<div id="terminal">
-  <div class="red-column"></div>
-  <div class="green-column"></div>
-  <div class="white-column"></div>
+<div id="terminal" aria-live="polite" aria-atomic="true">
+  <div class="red-column" aria-label="Kırmızı yazılar"></div>
+  <div class="green-column" aria-label="Yeşil yazılar"></div>
+  <div class="white-column" aria-label="Beyaz ve siyah yazılar"></div>
 </div>
 
-<div id="error">ERROR</div>
+<div id="error" role="alert" aria-live="assertive" aria-atomic="true">ERROR</div>
 
 <audio id="beep" preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
@@ -141,7 +141,7 @@
   const greenCol = terminal.querySelector('.green-column');
   const whiteCol = terminal.querySelector('.white-column');
 
-  // Korkutucu, teknik terimler
+  // Korkutucu teknik terimler (örnek)
   const redTexts = [
     "YETKİSİZ ERİŞİM ALINDI",
     "GÜVENLİK İHLALİ",
@@ -154,7 +154,6 @@
     "AĞ TRAFİĞİ ŞİFRELENEMİYOR",
     "KORUMA SİSTEMİ DEVRE DIŞI"
   ];
-
   const greenTexts = [
     "SSH BAĞLANTISI KURULUYOR",
     "PROTOKOLLER ANALİZ EDİLİYOR",
@@ -167,7 +166,6 @@
     "ŞİFRELER ÇÖZÜLÜYOR",
     "SİSTEM İZLENİYOR"
   ];
-
   const whiteTexts = [
     "terminal@zero-day:~$ ls -la",
     "total 64",
@@ -181,41 +179,49 @@
     "Restarting OpenSSH server..."
   ];
 
-  // Yazı sayısı ve hız
   const totalLines = 1000;
-  const totalDuration = 30000; // 30 saniye ms
+  const totalDuration = 30000; // 30 saniye
   const intervalTime = totalDuration / totalLines;
 
   let lineCount = 0;
 
-  // Ses kapalı başla, butona basınca açılacak
-  beep.volume = 0;
-  function playSound() {
-    beep.volume = 1;
-    beep.play();
+  beep.volume = 1;
+
+  function getLineFromArray(arr, i) {
+    return arr[i % arr.length];
   }
 
-  closeBtn.onclick = () => {
-    startBox.style.display = 'none';
-    terminal.style.display = 'flex';
-    playSound();
-    startWriting();
-  };
+  function writeLines() {
+    let rIndex = 0, gIndex = 0, wIndex = 0;
 
-  // Döngüsel yazı fonksiyonu
-  function startWriting() {
-    const totalRed = Math.floor(totalLines / 3);
-    const totalGreen = Math.floor(totalLines / 3);
-    const totalWhite = totalLines - totalRed - totalGreen;
+    const interval = setInterval(() => {
+      if(lineCount >= totalLines) {
+        clearInterval(interval);
+        showError();
+        return;
+      }
 
-    const redLen = redTexts.length;
-    const greenLen = greenTexts.length;
-    const whiteLen = whiteTexts.length;
+      // Üç sütuna sıralı yazı ekle
+      redCol.textContent += getLineFromArray(redTexts, rIndex) + "\n";
+      greenCol.textContent += getLineFromArray(greenTexts, gIndex) + "\n";
+      whiteCol.textContent += getLineFromArray(whiteTexts, wIndex) + "\n";
 
-    function getRedLine(i) { return redTexts[i % redLen]; }
-    function getGreenLine(i) { return greenTexts[i % greenLen]; }
-    function getWhiteLine(i) { return whiteTexts[i % whiteLen]; }
+      // Kaydırma hep en aşağıda olsun
+      redCol.scrollTop = redCol.scrollHeight;
+      greenCol.scrollTop = greenCol.scrollHeight;
+      whiteCol.scrollTop = whiteCol.scrollHeight;
 
-    const writeInterval = setInterval(() => {
-      if (lineCount >= totalLines) {
-        clearInterval
+      rIndex++;
+      gIndex++;
+      wIndex++;
+      lineCount++;
+    }, intervalTime);
+  }
+
+  function showError() {
+    error.style.display = 'block';
+    // 20 saniye boyunca yanıp sönmeye devam edecek
+    setTimeout(() => {
+      error.style.display = 'none';
+    }, 20000);
+ 
