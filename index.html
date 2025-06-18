@@ -8,193 +8,214 @@
   body {
     margin: 0; padding: 0;
     background-color: black;
-    overflow: hidden;
     font-family: monospace;
-    color: #00ff00;
+    overflow: hidden;
+    color: #0f0;
   }
-  #intro {
+  #start-box {
     position: absolute;
-    top: 40%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 3rem;
-    color: red;
-    border: 2px solid red;
-    padding: 20px;
+    background: #111;
+    border: 2px solid #0f0;
+    padding: 2rem 3rem;
     text-align: center;
-    animation: glow 1s infinite alternate;
+    color: #0f0;
+    font-size: 2.5rem;
+    user-select: none;
     z-index: 9999;
-    background: black;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
   }
-  @keyframes glow {
-    from { text-shadow: 0 0 5px red; }
-    to { text-shadow: 0 0 20px red; }
+  #start-box span {
+    flex-grow: 1;
+  }
+  #close-btn {
+    cursor: pointer;
+    background: #220000;
+    border: none;
+    color: #f00;
+    font-weight: bold;
+    font-size: 2.5rem;
+    padding: 0 0.7rem 0 0.7rem;
+    line-height: 1;
+    border-radius: 4px;
+    user-select: none;
   }
   #terminal {
     position: absolute;
-    top: 0; left: 0;
-    padding: 10px;
-    font-size: 14px;
-    white-space: pre;
-    width: 100%; height: 100%;
-    overflow-y: auto;
-    z-index: 1;
+    top: 0; left: 0; right: 0; bottom: 0;
     display: none;
-  }
-  .sub-terminal {
-    position: absolute;
-    width: 30vw; height: 25vh;
-    overflow-y: auto;
-    border: 1px solid #555;
-    background-color: black;
-    font-size: 12px;
-    padding: 5px;
     white-space: pre-wrap;
-    z-index: 10;
+    overflow-y: auto;
+    padding: 10px;
+    font-size: 16px;
+    line-height: 1.2;
+    display: flex;
+    flex-wrap: wrap;
+    color: transparent;
   }
-  #error-container {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 60vw;
-    height: 30vh;
-    background: black;
-    border: 4px solid red;
-    box-shadow: 0 0 30px 10px rgba(255, 0, 0, 0.7);
-    display: none;
-    z-index: 10000;
-    text-align: center;
-    padding-top: 2rem;
-    color: red;
-    font-size: 4rem;
+  /* 3 renkli kolon düzeni */
+  .red-column, .green-column, .white-column {
+    flex-grow: 1;
+    white-space: pre-wrap;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 10px;
     font-weight: bold;
-    font-family: monospace;
-    user-select: none;
-    text-transform: uppercase;
-    animation: fire-flicker 1.5s infinite alternate;
+    font-size: 1.1rem;
   }
-  #error-container span {
-    display: block;
-    letter-spacing: 0.5em;
-    margin-bottom: 1rem;
+  .red-column {
+    color: #f00;
+    background: #100000;
+    width: 33.33%;
   }
-  #error-container .flames {
-    font-size: 2rem;
-    animation: flames-move 0.8s infinite alternate;
+  .green-column {
+    color: #0f0;
+    background: #001000;
+    width: 33.33%;
   }
-  @keyframes fire-flicker {
-    0% { text-shadow:
-      0 0 8px #ff0000,
+  .white-column {
+    color: #eee;
+    background: #111;
+    width: 33.33%;
+    font-weight: normal;
+  }
+  /* Siyah arka plan için beyaz metin alanı */
+  .white-column.black-text {
+    color: #000;
+    background: #eee;
+  }
+
+  /* Error yazısı */
+  #error {
+    position: fixed;
+    bottom: 15%;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 5rem;
+    font-weight: bold;
+    color: #f00;
+    text-shadow:
+      0 0 10px #f00,
       0 0 20px #ff0000,
       0 0 30px #ff4500,
-      0 0 40px #ff4500,
-      0 0 50px #ff0000,
-      0 0 70px #ff4500,
-      0 0 80px #ff4500;}
-    100% { text-shadow:
-      0 0 15px #ff4500,
-      0 0 25px #ff0000,
-      0 0 40px #ff0000,
-      0 0 50px #ff4500,
-      0 0 60px #ff4500,
-      0 0 75px #ff0000,
-      0 0 90px #ff0000;}
+      0 0 40px #ff6347;
+    text-transform: uppercase;
+    display: none;
+    animation: blink-red 1s infinite alternate;
+    user-select: none;
+    z-index: 99999;
   }
-  @keyframes flames-move {
-    0% { opacity: 1; transform: translateY(0); }
-    100% { opacity: 0.7; transform: translateY(-5px); }
-  }
-  /* Kırmızı yanıp sönen arka plan */
-  .red-flash-bg {
-    animation: red-flash-bg 1s infinite alternate;
-  }
-  @keyframes red-flash-bg {
-    0% { background-color: black; }
-    50% { background-color: rgba(255,0,0,0.3); }
-    100% { background-color: black; }
+  @keyframes blink-red {
+    0% { opacity: 1; }
+    100% { opacity: 0.4; }
   }
 </style>
 </head>
 <body>
 
-<div id="intro">█ mhmtxaslan █</div>
-<div id="terminal"></div>
-<div id="error-container">
-  <span>!!! ERROR !!!</span>
-  <span class="flames">🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥</span>
+<div id="start-box">
+  <span>█ mhmtxaslan █</span>
+  <button id="close-btn" title="Başlat (Ses Aç)">✕</button>
 </div>
 
-<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<div id="terminal">
+  <div class="red-column"></div>
+  <div class="green-column"></div>
+  <div class="white-column"></div>
+</div>
+
+<div id="error">ERROR</div>
+
+<audio id="beep" preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
 <script>
-  const intro = document.getElementById("intro");
-  const terminal = document.getElementById("terminal");
-  const beep = document.getElementById("beep");
-  const errorContainer = document.getElementById("error-container");
+  const startBox = document.getElementById('start-box');
+  const closeBtn = document.getElementById('close-btn');
+  const terminal = document.getElementById('terminal');
+  const beep = document.getElementById('beep');
+  const error = document.getElementById('error');
+  const redCol = terminal.querySelector('.red-column');
+  const greenCol = terminal.querySelector('.green-column');
+  const whiteCol = terminal.querySelector('.white-column');
 
-  const colors = ["#ff0000", "#00ff00", "#ffffff", "#000000"];
-  const scaryLines = [
-    "SİSTEM GÖZETİM ALTINDA...",
-    "YETKİSİZ ERİŞİM ALGILANDI...",
-    "ZİHİN AĞINA GİRİLİYOR...",
-    "GERİ DÖNÜŞ YOK...",
-    "BİLİNÇ DIŞI BİR VARLIK UYANDI...",
-    "KONTROL SENDE DEĞİL...",
-    "SENİ GÖZLÜYORUZ...",
-    "SİSTEMİNİZDE YABANCI ZEKÂ AKTİF...",
-    "DOSYALAR BOZULUYOR...",
-    "KORKUNUN KENDİSİ YÜKLENİYOR..."
+  // Korkutucu, teknik terimler
+  const redTexts = [
+    "YETKİSİZ ERİŞİM ALINDI",
+    "GÜVENLİK İHLALİ",
+    "DOSYA KORUMASI BOZULDU",
+    "SİSTEME SIZMA DENEMESİ",
+    "İZİN DIŞI AKTİVİTE TESPİT EDİLDİ",
+    "ÇEKİRDEK DOSYALAR DEĞİŞTİRİLDİ",
+    "UZAK BAĞLANTI KURULDU",
+    "VERİ AKIŞI DURDURULAMADI",
+    "AĞ TRAFİĞİ ŞİFRELENEMİYOR",
+    "KORUMA SİSTEMİ DEVRE DIŞI"
   ];
 
-  function getRandomLine() {
-    return scaryLines[Math.floor(Math.random() * scaryLines.length)];
-  }
+  const greenTexts = [
+    "SSH BAĞLANTISI KURULUYOR",
+    "PROTOKOLLER ANALİZ EDİLİYOR",
+    "KOMUTLAR ÇALIŞTIRILIYOR",
+    "GÜVENLİK DUVARI ATLADI",
+    "VERİ SIZDIRMA TESTİ",
+    "PORTLAR KONTROL EDİLİYOR",
+    "KOMUT DOSYASI YÜRÜTÜLÜYOR",
+    "GÜVENLİ BAĞLANTI SORUNSUZ",
+    "ŞİFRELER ÇÖZÜLÜYOR",
+    "SİSTEM İZLENİYOR"
+  ];
 
-  function getRandomColor() {
-    // Kırmızı, yeşil, beyaz, siyah
-    const c = colors[Math.floor(Math.random() * colors.length)];
-    return c;
-  }
+  const whiteTexts = [
+    "terminal@zero-day:~$ ls -la",
+    "total 64",
+    "drwxr-xr-x  7 user user 4096 Jun 18 12:45 .",
+    "drwxr-xr-x  3 root root 4096 Jun 18 12:00 ..",
+    "-rw-r--r--  1 user user  220 Jun 18 12:45 .bashrc",
+    "-rw-r--r--  1 user user  675 Jun 18 12:45 .profile",
+    "drwxr-xr-x  2 user user 4096 Jun 18 12:45 Documents",
+    "drwxr-xr-x  2 user user 4096 Jun 18 12:45 Downloads",
+    "terminal@zero-day:~$ sudo service ssh restart",
+    "Restarting OpenSSH server..."
+  ];
 
-  function writeMainTerminal() {
-    terminal.style.display = "block";
-    let count = 0;
-    const interval = setInterval(() => {
-      const span = document.createElement("span");
-      span.style.color = getRandomColor();
-      span.textContent = getRandomLine() + "\n";
-      terminal.appendChild(span);
-      terminal.scrollTop = terminal.scrollHeight;
-      count++;
-      if (count >= 1000) {
-        clearInterval(interval);
-      }
-    }, 25);
-  }
+  // Yazı sayısı ve hız
+  const totalLines = 1000;
+  const totalDuration = 30000; // 30 saniye ms
+  const intervalTime = totalDuration / totalLines;
 
-  function showError() {
-    errorContainer.style.display = "block";
+  let lineCount = 0;
+
+  // Ses kapalı başla, butona basınca açılacak
+  beep.volume = 0;
+  function playSound() {
+    beep.volume = 1;
     beep.play();
-    document.body.classList.add("red-flash-bg");
-    setTimeout(() => {
-      errorContainer.style.display = "none";
-      document.body.classList.remove("red-flash-bg");
-    }, 20000);
   }
 
-  // Başlangıç: 3 sn mhmtxaslan, sonra main terminal başlar
-  setTimeout(() => {
-    intro.style.display = "none";
-    writeMainTerminal();
-  }, 3000);
+  closeBtn.onclick = () => {
+    startBox.style.display = 'none';
+    terminal.style.display = 'flex';
+    playSound();
+    startWriting();
+  };
 
-  // 29. saniyede ERROR göster
-  setTimeout(() => {
-    showError();
-  }, 29000);
+  // Döngüsel yazı fonksiyonu
+  function startWriting() {
+    const totalRed = Math.floor(totalLines / 3);
+    const totalGreen = Math.floor(totalLines / 3);
+    const totalWhite = totalLines - totalRed - totalGreen;
 
-</script>
+    const redLen = redTexts.length;
+    const greenLen = greenTexts.length;
+    const whiteLen = whiteTexts.length;
 
-</body>
-</html>
+    function getRedLine(i) { return redTexts[i % redLen]; }
+    function getGreenLine(i) { return greenTexts[i % greenLen]; }
+    function getWhiteLine(i) { return whiteTexts[i % whiteLen]; }
+
+    const writeInterval = setInterval(() => {
+      if (lineCount >= totalLines) {
+        clearInterval
