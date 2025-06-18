@@ -2,112 +2,174 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Zero Day Sim</title>
+  <title>zero-day-sim</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
+      background-color: black;
       margin: 0;
-      background: black;
-      color: #00ff00;
-      font-family: monospace;
+      padding: 0;
       overflow: hidden;
-      font-size: 16px;
+      font-family: monospace;
+      color: #00ff00;
     }
-    #terminal {
+    #intro {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3rem;
+      color: red;
+      border: 2px solid red;
       padding: 20px;
-      white-space: pre-wrap;
-      height: 100vh;
-      overflow-y: auto;
-      box-sizing: border-box;
-    }
-    .error-final {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: red;
-      color: white;
-      font-size: 32px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      animation: blink 0.5s infinite;
+      text-align: center;
+      animation: glow 1s infinite alternate;
       z-index: 9999;
     }
-    @keyframes blink {
-      0%   { opacity: 1; }
-      50%  { opacity: 0.2; }
+    @keyframes glow {
+      from { text-shadow: 0 0 5px red; }
+      to { text-shadow: 0 0 20px red; }
+    }
+    #terminal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 10px;
+      font-size: 14px;
+      white-space: pre;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      z-index: 1;
+      display: none;
+    }
+    .sub-terminal {
+      position: absolute;
+      width: 30vw;
+      height: 25vh;
+      overflow: hidden;
+      border: 1px solid #555;
+      background-color: black;
+      font-size: 12px;
+      padding: 5px;
+      white-space: pre-wrap;
+    }
+    .error-final {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 4rem;
+      color: red;
+      font-weight: bold;
+      animation: flash 0.2s steps(2) infinite;
+      z-index: 9999;
+      display: none;
+    }
+    @keyframes flash {
+      0% { opacity: 1; }
+      50% { opacity: 0; }
       100% { opacity: 1; }
     }
   </style>
 </head>
 <body>
-  <div id="terminal"></div>
-  <audio id="startSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
-  <script>
-    const terminal = document.getElementById('terminal');
-    const startSound = document.getElementById('startSound');
 
-    const korkuYazilari = [
-      "Sistem ihlali tespit edildi.",
-      "Veritabanı bütünlüğü bozuldu.",
-      "Kod parçalanıyor...",
-      "AI kontrolü ele geçiriyor.",
-      "Yedekleme yok edildi.",
-      "Kritik dosya silindi: /root/access.key",
-      "Bellek taşması algılandı.",
-      "Güvenlik duvarı devre dışı.",
-      "Kendine kopyalama başladı...",
-      "Sistem davranışı anormalleşti.",
-      "Bilinmeyen işlem çalışıyor...",
-      "Bağlantı kesilemedi.",
-      "ÇÖKÜŞ BAŞLADI...",
-      "AI: Seni izliyorum...",
-      "AI: Durmak yok.",
-      "Şifreler çözülüyor...",
-      "Port 666 açık!",
-      "UNKNOWN MODULE: Karanlık başladı.",
-      "Sonsuz döngü tetiklendi...",
-      "RAM eriyor...",
-      "Sistemi geri döndürmek imkansız.",
-      "Yazılım parçalanıyor.",
-      "ÇIKIŞ YOK.",
-      "Donanıma erişim sağlandı.",
-      "YÜKLENİYOR ███████████████████ 99%",
-      "AI: Merhaba, artık ben varım.",
-    ];
+<div id="intro">█ mhmtxaslan █</div>
+<div id="terminal"></div>
+<div id="error" class="error-final">!!! 𝐄𝐑𝐑𝐎𝐑 !!!</div>
+<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
-    const renkler = ["#ff0000", "#00ff00", "#ffffff", "#000000"];
-    const totalLines = 1000;
+<script>
+  const intro = document.getElementById("intro");
+  const terminal = document.getElementById("terminal");
+  const beep = document.getElementById("beep");
+  const error = document.getElementById("error");
 
-    function getRandomYazi() {
-      const yazi = korkuYazilari[Math.floor(Math.random() * korkuYazilari.length)];
-      const renk = renkler[Math.floor(Math.random() * renkler.length)];
-      return `<span style="color:${renk}">${yazi}</span>`;
-    }
+  const colors = ["#ff0000", "#00ff00", "#ffffff"];
+  const scaryLines = [
+    "SİSTEM GÖZETİM ALTINDA...",
+    "YETKİSİZ ERİŞİM ALGILANDI...",
+    "ZİHİN AĞINA GİRİLİYOR...",
+    "GERİ DÖNÜŞ YOK...",
+    "BİLİNÇ DIŞI BİR VARLIK UYANDI...",
+    "KONTROL SENDE DEĞİL...",
+    "SENİ GÖZLÜYORUZ...",
+    "SİSTEMİNİZDE YABANCI ZEKÂ AKTİF...",
+    "DOSYALAR BOZULUYOR...",
+    "KORKUNUN KENDİSİ YÜKLENİYOR..."
+  ];
 
-    function yazSatirlar(index = 0) {
-      if (index >= totalLines) return finalError();
-      const satir = document.createElement("div");
-      satir.innerHTML = getRandomYazi();
-      terminal.appendChild(satir);
+  function getRandomLine() {
+    return scaryLines[Math.floor(Math.random() * scaryLines.length)];
+  }
+
+  function getRandomColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  function writeMainTerminal() {
+    terminal.style.display = "block";
+    let count = 0;
+    const interval = setInterval(() => {
+      const span = document.createElement("span");
+      span.style.color = getRandomColor();
+      span.textContent = getRandomLine() + "\n";
+      terminal.appendChild(span);
       terminal.scrollTop = terminal.scrollHeight;
-      setTimeout(() => yazSatirlar(index + 1), 25); // Hızlı yazım
-    }
+      count++;
+      if (count >= 1000) {
+        clearInterval(interval);
+      }
+    }, 25);
+  }
 
-    function finalError() {
-      const errorDiv = document.createElement("div");
-      errorDiv.className = "error-final";
-      errorDiv.innerText = "!!! ERROR !!!\n!!! ERROR !!!\n!!! ERROR !!!";
-      document.body.appendChild(errorDiv);
-    }
+  function createSubTerminals() {
+    const positions = [
+      [10, 10], [50, 10], [30, 40], [70, 60], [15, 70]
+    ];
+    positions.forEach((pos, idx) => {
+      setTimeout(() => {
+        const sub = document.createElement("div");
+        sub.className = "sub-terminal";
+        sub.style.top = pos[1] + "vh";
+        sub.style.left = pos[0] + "vw";
+        sub.style.color = getRandomColor();
+        document.body.appendChild(sub);
 
-    // Başlangıç animasyonu
-    terminal.innerHTML = "@mhmtxaslan\n";
+        let c = 0;
+        const writeFast = setInterval(() => {
+          const span = document.createElement("span");
+          span.style.color = getRandomColor();
+          span.textContent = getRandomLine() + "\n";
+          sub.appendChild(span);
+          c++;
+          if (c >= 50) clearInterval(writeFast);
+        }, 10);
+      }, 10000 + idx * 1000);
+    });
+  }
+
+  function showError() {
+    error.style.display = "block";
+    beep.play();
     setTimeout(() => {
-      startSound.play();
-      yazSatirlar();
-    }, 5000); // 5 saniye bekle, sonra başlat
-  </script>
+      error.style.display = "none";
+    }, 20000); // 20 saniye sonra ERROR kapanacak
+  }
+
+  // Başlangıçta intro göster
+  setTimeout(() => {
+    intro.style.display = "none";
+    writeMainTerminal();
+    createSubTerminals();
+  }, 3000);
+
+  // 29. saniyede ERROR göster, 20 saniye yanıp sönsün sonra kapanacak
+  setTimeout(() => {
+    showError();
+  }, 29000);
+</script>
+
 </body>
 </html>
