@@ -1,92 +1,139 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>zero-day-sim</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      background-color: black;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      font-family: monospace;
-      color: #00ff00;
-    }
-    #intro {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 3rem;
-      color: red;
-      border: 2px solid red;
-      padding: 20px;
-      text-align: center;
-      animation: glow 1s infinite alternate;
-      z-index: 9999;
-    }
-    @keyframes glow {
-      from { text-shadow: 0 0 5px red; }
-      to { text-shadow: 0 0 20px red; }
-    }
-    #terminal {
-      position: absolute;
-      top: 0;
-      left: 0;
-      padding: 10px;
-      font-size: 14px;
-      white-space: pre;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      z-index: 1;
-      display: none;
-    }
-    .sub-terminal {
-      position: absolute;
-      width: 30vw;
-      height: 25vh;
-      overflow: hidden;
-      border: 1px solid #555;
-      background-color: black;
-      font-size: 12px;
-      padding: 5px;
-      white-space: pre-wrap;
-    }
-    .error-final {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      font-size: 4rem;
-      color: red;
-      font-weight: bold;
-      animation: flash 0.2s steps(2) infinite;
-      z-index: 9999;
-      display: none;
-    }
-    @keyframes flash {
-      0% { opacity: 1; }
-      50% { opacity: 0; }
-      100% { opacity: 1; }
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>zero-day-sim</title>
+<style>
+  body {
+    margin: 0; padding: 0;
+    background-color: black;
+    overflow: hidden;
+    font-family: monospace;
+    color: #00ff00;
+  }
+  #intro {
+    position: absolute;
+    top: 40%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    color: red;
+    border: 2px solid red;
+    padding: 20px;
+    text-align: center;
+    animation: glow 1s infinite alternate;
+    z-index: 9999;
+    background: black;
+  }
+  @keyframes glow {
+    from { text-shadow: 0 0 5px red; }
+    to { text-shadow: 0 0 20px red; }
+  }
+  #terminal {
+    position: absolute;
+    top: 0; left: 0;
+    padding: 10px;
+    font-size: 14px;
+    white-space: pre;
+    width: 100%; height: 100%;
+    overflow-y: auto;
+    z-index: 1;
+    display: none;
+  }
+  .sub-terminal {
+    position: absolute;
+    width: 30vw; height: 25vh;
+    overflow-y: auto;
+    border: 1px solid #555;
+    background-color: black;
+    font-size: 12px;
+    padding: 5px;
+    white-space: pre-wrap;
+    z-index: 10;
+  }
+  #error-container {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60vw;
+    height: 30vh;
+    background: black;
+    border: 4px solid red;
+    box-shadow: 0 0 30px 10px rgba(255, 0, 0, 0.7);
+    display: none;
+    z-index: 10000;
+    text-align: center;
+    padding-top: 2rem;
+    color: red;
+    font-size: 4rem;
+    font-weight: bold;
+    font-family: monospace;
+    user-select: none;
+    text-transform: uppercase;
+    animation: fire-flicker 1.5s infinite alternate;
+  }
+  #error-container span {
+    display: block;
+    letter-spacing: 0.5em;
+    margin-bottom: 1rem;
+  }
+  #error-container .flames {
+    font-size: 2rem;
+    animation: flames-move 0.8s infinite alternate;
+  }
+  @keyframes fire-flicker {
+    0% { text-shadow:
+      0 0 8px #ff0000,
+      0 0 20px #ff0000,
+      0 0 30px #ff4500,
+      0 0 40px #ff4500,
+      0 0 50px #ff0000,
+      0 0 70px #ff4500,
+      0 0 80px #ff4500;}
+    100% { text-shadow:
+      0 0 15px #ff4500,
+      0 0 25px #ff0000,
+      0 0 40px #ff0000,
+      0 0 50px #ff4500,
+      0 0 60px #ff4500,
+      0 0 75px #ff0000,
+      0 0 90px #ff0000;}
+  }
+  @keyframes flames-move {
+    0% { opacity: 1; transform: translateY(0); }
+    100% { opacity: 0.7; transform: translateY(-5px); }
+  }
+  /* Kırmızı yanıp sönen arka plan */
+  .red-flash-bg {
+    animation: red-flash-bg 1s infinite alternate;
+  }
+  @keyframes red-flash-bg {
+    0% { background-color: black; }
+    50% { background-color: rgba(255,0,0,0.3); }
+    100% { background-color: black; }
+  }
+</style>
 </head>
 <body>
 
 <div id="intro">█ mhmtxaslan █</div>
 <div id="terminal"></div>
-<div id="error" class="error-final">!!! 𝐄𝐑𝐑𝐎𝐑 !!!</div>
+<div id="error-container">
+  <span>!!! ERROR !!!</span>
+  <span class="flames">🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥</span>
+</div>
+
 <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script>
   const intro = document.getElementById("intro");
   const terminal = document.getElementById("terminal");
   const beep = document.getElementById("beep");
-  const error = document.getElementById("error");
+  const errorContainer = document.getElementById("error-container");
 
-  const colors = ["#ff0000", "#00ff00", "#ffffff"];
+  const colors = ["#ff0000", "#00ff00", "#ffffff", "#000000"];
   const scaryLines = [
     "SİSTEM GÖZETİM ALTINDA...",
     "YETKİSİZ ERİŞİM ALGILANDI...",
@@ -105,7 +152,9 @@
   }
 
   function getRandomColor() {
-    return colors[Math.floor(Math.random() * colors.length)];
+    // Kırmızı, yeşil, beyaz, siyah
+    const c = colors[Math.floor(Math.random() * colors.length)];
+    return c;
   }
 
   function writeMainTerminal() {
@@ -124,51 +173,27 @@
     }, 25);
   }
 
-  function createSubTerminals() {
-    const positions = [
-      [10, 10], [50, 10], [30, 40], [70, 60], [15, 70]
-    ];
-    positions.forEach((pos, idx) => {
-      setTimeout(() => {
-        const sub = document.createElement("div");
-        sub.className = "sub-terminal";
-        sub.style.top = pos[1] + "vh";
-        sub.style.left = pos[0] + "vw";
-        sub.style.color = getRandomColor();
-        document.body.appendChild(sub);
-
-        let c = 0;
-        const writeFast = setInterval(() => {
-          const span = document.createElement("span");
-          span.style.color = getRandomColor();
-          span.textContent = getRandomLine() + "\n";
-          sub.appendChild(span);
-          c++;
-          if (c >= 50) clearInterval(writeFast);
-        }, 10);
-      }, 10000 + idx * 1000);
-    });
-  }
-
   function showError() {
-    error.style.display = "block";
+    errorContainer.style.display = "block";
     beep.play();
+    document.body.classList.add("red-flash-bg");
     setTimeout(() => {
-      error.style.display = "none";
-    }, 20000); // 20 saniye sonra ERROR kapanacak
+      errorContainer.style.display = "none";
+      document.body.classList.remove("red-flash-bg");
+    }, 20000);
   }
 
-  // Başlangıçta intro göster
+  // Başlangıç: 3 sn mhmtxaslan, sonra main terminal başlar
   setTimeout(() => {
     intro.style.display = "none";
     writeMainTerminal();
-    createSubTerminals();
   }, 3000);
 
-  // 29. saniyede ERROR göster, 20 saniye yanıp sönsün sonra kapanacak
+  // 29. saniyede ERROR göster
   setTimeout(() => {
     showError();
   }, 29000);
+
 </script>
 
 </body>
