@@ -1,54 +1,141 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>mhmtxaslan</title>
-  <style>
-    body {
-      margin: 0;
-      background: #000;
-      color: #fff;
-      font-family: 'Courier New', monospace;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-    }
-    .container {
-      text-align: center;
-    }
-    .username {
-      font-size: 3rem;
-      margin-bottom: 20px;
-      background: linear-gradient(to right, red, white);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: bold;
-    }
-    .button {
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      color: #000;
-      background-color: #fff;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .button:hover {
-      background-color: crimson;
-      color: #fff;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>mhmtxaslan Zero‑Day Sim</title>
+<style>
+  body {
+    margin:0; padding:0; background:black; font-family: monospace; overflow:hidden; color:#0f0;
+  }
+  #start-box {
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    background:#111; border:2px solid #0f0; padding:2rem 3rem; text-align:center; font-size:2rem;
+    user-select:none; z-index:9999; display:flex; align-items:center;
+  }
+  #start-box span {flex-grow:1;}
+  #close-btn {
+    font-size:2rem; background:#220000; border:none; color:#f00;
+    padding:0 .8rem; cursor:pointer;
+  }
+  #terminal {
+    display:none; position:absolute; top:0; left:0; right:0; bottom:0;
+    padding:10px; white-space:pre-wrap; overflow:auto; display:flex;
+  }
+  .col {flex:1; padding:10px; overflow:auto; height:100vh; white-space:pre-wrap;}
+  .red {color:#f00; background:#100000;}
+  .green {color:#0f0; background:#001000;}
+  .white {color:#eee; background:#111;}
+  .white.black-text {color:#000; background:#eee;}
+  .sub-terminal {
+    position:absolute; width:25vw; height:20vh; overflow:auto;
+    border:1px solid #555; background:black; padding:5px;
+    font-size:12px; z-index:10;
+  }
+  #error {
+    position:absolute; bottom:15%; left:50%; transform:translateX(-50%);
+    font-size:5rem; font-weight:bold; color:#f00;
+    text-shadow:0 0 10px #f00,0 0 20px #ff4500,0 0 30px #ff6347;
+    text-transform:uppercase; display:none;
+    animation:blink 1s alternate infinite; z-index:9999;
+  }
+  @keyframes blink {from{opacity:1;}to{opacity:0.3;}}
+  .flash-bg {
+    animation:redbg 1s alternate infinite;
+  }
+  @keyframes redbg {from{background:black;}to{background:rgba(255,0,0,0.3);}}
+</style>
 </head>
 <body>
-  <div class="container">
-    <div class="username">@mhmtxaslan</div>
-    <button class="button" onclick="window.open('https://instagram.com/kendi-profilin', '_blank')">
-      Instagram Profilime Git
-    </button>
-  </div>
+
+<div id="start-box">
+  <span>█ @mhmtxaslan █</span>
+  <button id="close-btn">✖</button>
+</div>
+
+<div id="terminal">
+  <div class="col red"></div>
+  <div class="col green"></div>
+  <div class="col white"></div>
+</div>
+
+<div id="error">ERROR</div>
+<audio id="beep" preload="auto" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+
+<script>
+  const startBox = document.getElementById('start-box');
+  const closeBtn = document.getElementById('close-btn');
+  const terminal = document.getElementById('terminal');
+  const beep = document.getElementById('beep');
+  const error = document.getElementById('error');
+  const redCol = terminal.children[0];
+  const greenCol = terminal.children[1];
+  const whiteCol = terminal.children[2];
+
+  const redTexts = ["YETKİSİZ ERİŞİM","GÜVENLİK İHLALİ","SİSTEME SIZMA","LOGLAR SİLİNİYOR","KONTROL DEĞİŞTİ"];
+  const greenTexts = ["SSH BAĞLANTISI","KOMUT ÇALIŞTIRILIYOR","PROTOKOL ANALİZ","ŞİFRELER ÇÖZÜLÜYOR","SİSTEM İZLENİYOR"];
+  const whiteTexts = ["terminal@zero-day:~$ ls","system.log","auth.log","config.sys","backup bakımı tamam"];
+
+  const totalLines = 1000;
+  const interval = 30000/totalLines;
+  let count = 0;
+
+  function getLine(arr,i){return arr[i%arr.length];}
+
+  function writeLines(){
+    const iv = setInterval(() => {
+      if(count>=totalLines){
+        clearInterval(iv);
+        showError();
+        return;
+      }
+      redCol.textContent += getLine(redTexts,count)+"\n";
+      greenCol.textContent += getLine(greenTexts,count)+"\n";
+      whiteCol.textContent += getLine(whiteTexts,count)+"\n";
+      redCol.scrollTop = redCol.scrollHeight;
+      greenCol.scrollTop = greenCol.scrollHeight;
+      whiteCol.scrollTop = whiteCol.scrollHeight;
+      count++;
+    },interval);
+  }
+
+  function createBoxes(){
+    const pos=[[5,5],[60,10],[10,60],[55,65]];
+    pos.forEach((p,i)=>{
+      setTimeout(()=>{
+        const sub=document.createElement('div');
+        sub.className='sub-terminal';
+        sub.style.top=p[1]+'vh';
+        sub.style.left=p[0]+'vw';
+        document.body.appendChild(sub);
+        let c=0;
+        const si=setInterval(()=>{
+          if(c>=50){clearInterval(si);return;}
+          sub.textContent+=getLine(redTexts,c)+"\n";
+          c++;
+        },10);
+      },5000+i*1000);
+    });
+  }
+
+  function showError(){
+    error.style.display='block';
+    document.body.classList.add('flash-bg');
+    beep.play().catch(e=>console.log(e));
+    setTimeout(()=>{
+      error.style.display='none';
+      document.body.classList.remove('flash-bg');
+    },20000);
+  }
+
+  closeBtn.onclick = () => {
+    startBox.style.display='none';
+    terminal.style.display='flex';
+    beep.volume = 1; beep.play().catch(e=>console.log(e));
+    writeLines();
+    createBoxes();
+    setTimeout(showError,29000);
+  };
+</script>
 </body>
 </html>
