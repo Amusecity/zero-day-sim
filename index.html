@@ -6,147 +6,166 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     html, body {
+      background: black;
       margin: 0;
       padding: 0;
-      background: black;
-      color: #00ff00;
       font-family: monospace;
       overflow: hidden;
     }
-    .terminal-box {
-      position: absolute;
-      width: 30vw;
-      height: 30vh;
-      overflow: hidden;
-      background: black;
-      border: 1px solid #444;
+    #root {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 8px;
+      padding: 10px;
+    }
+    .terminal {
+      background-color: #111;
+      color: #0f0;
       padding: 5px;
       font-size: 12px;
-      color: #00ff00;
-      box-shadow: 0 0 10px #00ff00;
+      line-height: 1.2;
+      overflow: hidden;
+      white-space: pre-wrap;
+      border: 1px solid #0f0;
+      box-shadow: 0 0 8px #0f0;
     }
-    .error-screen {
+    .big {
+      width: 95%;
+      height: 35vh;
+    }
+    .small {
+      width: 30%;
+      height: 20vh;
+    }
+    .error {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%;
-      height: 100%;
-      background: red;
-      color: white;
-      font-size: 3em;
-      font-weight: bold;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 28px;
+      color: red;
+      background: black;
+      padding: 20px;
+      border: 3px solid red;
       text-align: center;
-      padding-top: 20%;
-      animation: flash 0.6s steps(1) infinite;
+      animation: blink 0.5s steps(1) infinite;
       z-index: 9999;
     }
-    @keyframes flash {
+    @keyframes blink {
       50% { opacity: 0; }
     }
-    .exclaim {
-      position: fixed;
-      font-size: 2em;
-      font-weight: bold;
-      color: white;
-      animation: move 1s linear infinite;
-      z-index: 9998;
+    .warning {
+      position: absolute;
+      color: red;
+      font-size: 20px;
+      animation: move 2s linear infinite;
     }
     @keyframes move {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(100vh); }
+      0% {
+        top: 0;
+        left: 0;
+      }
+      100% {
+        top: 100%;
+        left: 100%;
+      }
     }
   </style>
 </head>
 <body>
-  <div id="main-terminal" class="terminal-box" style="top: 5%; left: 5%; width: 80vw; height: 40vh; font-size: 14px;"></div>
-  <audio id="start-sound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+  <div id="root">
+    <div class="terminal big" id="mainTerminal">@mhmtxaslan</div>
+  </div>
+  <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto" autoplay></audio>
 
   <script>
-    const mainTerminal = document.getElementById("main-terminal");
-    const startSound = document.getElementById("start-sound");
-    let allTerminals = [];
+    const mainTerminal = document.getElementById("mainTerminal");
+    const root = document.getElementById("root");
+    const beep = document.getElementById("beep");
 
-    const mainLines = ["@mhmtxaslan başlatılıyor..."];
-    for (let i = 1; i <= 500; i++) {
-      mainLines.push("AI_LOG #" + i + " -> Veri işleniyor...");
+    function randomLine() {
+      const samples = [
+        ">> bağlantı kuruluyor...",
+        ">> erişim talep ediliyor...",
+        ">> sistem dosyaları taranıyor...",
+        ">> şifreleme bypass edildi...",
+        ">> veri paketi analiz ediliyor...",
+        ">> AI protokolü aktifleşti...",
+        ">> güvenlik devre dışı...",
+        ">> root yetkisi alındı...",
+        ">> loglar siliniyor...",
+        ">> ip gizleniyor...",
+      ];
+      return samples[Math.floor(Math.random() * samples.length)];
     }
 
-    const boxColors = ['red', 'black', 'white'];
-    const textColors = ['white', '#00ff00', 'black'];
-
-    function createTerminal(top, left, bg, color) {
-      const box = document.createElement("div");
-      box.className = "terminal-box";
-      box.style.top = top + 'vh';
-      box.style.left = left + 'vw';
-      box.style.backgroundColor = bg;
-      box.style.color = color;
-      document.body.appendChild(box);
-      return box;
+    let mainCount = 0;
+    function writeToMain() {
+      if (mainCount >= 1000) return;
+      mainTerminal.innerHTML += "\n" + randomLine();
+      mainTerminal.scrollTop = mainTerminal.scrollHeight;
+      mainCount++;
+      setTimeout(writeToMain, 15);
     }
 
-    function typeLines(box, lines, delay = 50) {
-      let i = 0;
-      function write() {
-        if (i < lines.length) {
-          box.innerHTML += lines[i++] + "<br>";
-          box.scrollTop = box.scrollHeight;
-          setTimeout(write, delay);
-        }
+    setTimeout(() => {
+      writeToMain();
+    }, 5000);
+
+    const colors = [
+      { bg: "red", fg: "white" },
+      { bg: "white", fg: "black" },
+      { bg: "black", fg: "lime" }
+    ];
+
+    function createSmallTerminal(index) {
+      const term = document.createElement("div");
+      term.className = "terminal small";
+      const clr = colors[index % colors.length];
+      term.style.backgroundColor = clr.bg;
+      term.style.color = clr.fg;
+      term.innerText = "";
+      root.appendChild(term);
+
+      let lineCount = 0;
+      function writeLine() {
+        if (lineCount >= 50) return;
+        term.innerText += randomLine() + "\n";
+        lineCount++;
+        setTimeout(writeLine, 60);
       }
-      write();
+      writeLine();
     }
 
-    function startMain() {
-      startSound.play();
-      typeLines(mainTerminal, mainLines, 50);
-      setTimeout(spawnBoxes, 5000);
-    }
-
-    function spawnBoxes() {
-      let top = 50;
-      let left = 5;
-      let delay = 0;
-
-      for (let b = 0; b < 4; b++) {
-        setTimeout(() => {
-          const box = createTerminal(top, left, boxColors[b % 3], textColors[b % 3]);
-          allTerminals.push(box);
-          const lines = [];
-          for (let i = 0; i < 50; i++) {
-            lines.push("KOD[" + (b+1) + "-" + i + "] Sistem devrede...");
-          }
-          typeLines(box, lines, 60);
-          left += 35;
-          if (left > 60) {
-            left = 5;
-            top += 35;
-          }
-        }, delay);
-        delay += 3000;
+    setTimeout(() => {
+      for (let i = 0; i < 5; i++) {
+        setTimeout(() => createSmallTerminal(i), i * 1000);
       }
+    }, 10000); // 5 sn + 5 sn
 
-      setTimeout(showError, 30000);
-    }
-
-    function showError() {
+    // Finalde ERROR mesajı
+    setTimeout(() => {
       const err = document.createElement("div");
-      err.className = "error-screen";
-      err.innerText = "!!! SYSTEM ERROR !!!";
+      err.className = "error";
+      err.innerText = "!!! SYSTEM OVERRIDE: ERROR !!!";
       document.body.appendChild(err);
 
-      for (let i = 0; i < 40; i++) {
-        const ex = document.createElement("div");
-        ex.className = "exclaim";
-        ex.innerText = "!";
-        ex.style.top = Math.random() * 100 + "vh";
-        ex.style.left = Math.random() * 100 + "vw";
-        document.body.appendChild(ex);
+      // Uçuşan ünlemler
+      for (let i = 0; i < 30; i++) {
+        const w = document.createElement("div");
+        w.className = "warning";
+        w.innerText = "!";
+        w.style.top = Math.random() * 80 + "%";
+        w.style.left = Math.random() * 80 + "%";
+        document.body.appendChild(w);
       }
 
-      startSound.play();
-    }
-
-    window.onload = startMain;
+    }, 30000);
   </script>
 </body>
 </html>
