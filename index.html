@@ -1,276 +1,129 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zero-Day Sim Terminal</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-  * {
-    margin: 0; padding: 0; box-sizing: border-box;
-  }
-  body, html {
-    height: 100%;
-    background: black;
-    color: #0f0;
-    font-family: 'Share Tech Mono', monospace;
-    overflow: hidden;
-    user-select: none;
-  }
-  #introBox {
-    position: fixed;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    background: #111;
-    border: 2px solid #0f0;
-    padding: 20px 50px 20px 20px;
-    font-size: 2.2rem;
-    color: #0f0;
-    letter-spacing: 2px;
-    box-shadow: 0 0 15px #0f0;
-    display: flex;
-    align-items: center;
-    z-index: 9999;
-  }
-  #closeBtn {
-    cursor: pointer;
-    color: #f00;
-    font-weight: bold;
-    font-size: 1.8rem;
-    margin-left: 15px;
-    border: 2px solid #f00;
-    padding: 0 8px 4px 8px;
-    border-radius: 4px;
-    user-select: none;
-  }
-  #terminalBg {
-    position: fixed;
-    top: 0; left: 0; right:0; bottom: 0;
-    background: black;
-    overflow: hidden;
-    z-index: 1;
-  }
-  .lineSet {
-    position: absolute;
-    width: 100%;
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    pointer-events: none;
-  }
-  #redLines {
-    top: 10%;
-    left: 0;
-    color: #ff2b2b;
-    letter-spacing: 1.2px;
-  }
-  #greenLines {
-    top: 50%;
-    left: 0;
-    color: #2bff58;
-    letter-spacing: 1.2px;
-  }
-  #whiteLines {
-    top: 90%;
-    left: 0;
-    color: #eee;
-    letter-spacing: 1.2px;
-  }
-  .terminalBox {
-    position: fixed;
-    background: #000;
-    border: 2px solid #0f0;
-    font-family: 'Share Tech Mono', monospace;
-    color: #0f0;
-    font-size: 0.9rem;
-    padding: 8px 10px;
-    box-shadow: 0 0 8px #0f0;
-    overflow-y: auto;
-    overflow-x: hidden;
-    white-space: pre-wrap;
-    z-index: 999;
-  }
-  /* Kutular pozisyonları */
-  #term1 { top: 20%; left: 5%; width: 30%; height: 35%; }
-  #term2 { top: 25%; right: 5%; width: 22%; height: 30%; border-color: #f00; color: #f00; box-shadow: 0 0 10px #f00;}
-  #term3 { top: 60%; left: 10%; width: 20%; height: 25%; border-color: #eee; color: #eee; box-shadow: 0 0 8px #eee;}
-  #term4 { top: 60%; right: 15%; width: 25%; height: 30%; border-color: #2bff58; color: #2bff58; box-shadow: 0 0 10px #2bff58;}
-  #errorOverlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: black;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 10000;
-    pointer-events: none;
-  }
-  #errorText {
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 6rem;
-    font-weight: 900;
-    color: #f00;
-    text-shadow:
-      0 0 5px #f00,
-      0 0 10px #f00,
-      0 0 20px #ff0000,
-      0 0 40px #ff0000,
-      0 0 80px #ff0000;
-    animation: flicker 1.5s infinite alternate;
-    user-select: none;
-  }
-  /* Yanıp sönme animasyonu */
-  @keyframes flicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-  /* Ünlem işaretleri */
-  #exclamations {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    pointer-events: none;
-    overflow: hidden;
-    z-index: 9999;
-  }
-  .exclMark {
-    position: absolute;
-    font-size: 3rem;
-    color: #f00;
-    text-shadow: 0 0 5px #f00;
-    user-select: none;
-    animation-name: moveExcl;
-    animation-timing-function: linear;
-    animation-iteration-count: infinite;
-  }
-  @keyframes moveExcl {
-    0% {
-      transform: translateY(-100%);
-      opacity: 1;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zero-Day Sim</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: lime;
+      font-family: monospace;
+      overflow: hidden;
     }
-    100% {
-      transform: translateY(110vh);
-      opacity: 0;
+
+    #intro {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      color: red;
+      border: 2px solid red;
+      padding: 20px;
+      animation: blink 1s infinite;
     }
-  }
-</style>
+
+    @keyframes blink {
+      0%, 50%, 100% { opacity: 1; }
+      25%, 75% { opacity: 0; }
+    }
+
+    #terminal {
+      display: none;
+      padding: 20px;
+      white-space: pre-wrap;
+      color: #00ff00;
+      font-size: 14px;
+    }
+
+    #errorScreen {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: black;
+      color: red;
+      font-size: 5em;
+      font-weight: bold;
+      text-align: center;
+      animation: flash 0.5s infinite;
+      z-index: 9999;
+      padding-top: 20%;
+    }
+
+    @keyframes flash {
+      0%, 100% { background: black; color: red; }
+      50% { background: red; color: black; }
+    }
+  </style>
 </head>
 <body>
+  <div id="intro">@mhmtxaslan</div>
+  <div id="terminal"></div>
+  <div id="errorScreen">!!! ERROR !!!</div>
 
-<div id="introBox">
-  @mhmtxaslan
-  <div id="closeBtn" title="Başlat (Ses Aç/Kapa)">×</div>
-</div>
+  <script>
+    const intro = document.getElementById("intro");
+    const terminal = document.getElementById("terminal");
+    const errorScreen = document.getElementById("errorScreen");
 
-<div id="terminalBg" style="display:none;">
-  <div id="redLines" class="lineSet"></div>
-  <div id="greenLines" class="lineSet"></div>
-  <div id="whiteLines" class="lineSet"></div>
+    const scaryLines = [
+      "SISTEM GIRISI ALGILANDI...",
+      "ROOT YETKISI ALINDI...",
+      "FIREWALL BAYPAS EDILDI...",
+      "SIFRELER ÇÖZÜLDÜ...",
+      "VERILER SIZDIRILIYOR...",
+      "KULLANICI OTURUMU KOPYALANIYOR...",
+      "ÇEKIRDEK YAZILIM HATASI...",
+      "TROJAN YÜKLENDI...",
+      "SISTEM MANUEL MODA GEÇTI...",
+      "GÖRÜNMEZLIK MODU AKTIF...",
+      "LOG DOSYALARI SILINIYOR...",
+      "UZAKTAN BAGLANTI BASLATILDI...",
+      "ANA MAKINE IP: 127.0.0.1",
+      "DESTEK KOD: 0x00F1DEAD",
+      "DOSYA SISTEMI KIRILIYOR...",
+      "ZAMANLAYICI ETKINLESTIRILDI...",
+      "KONTROL TAMAMLANDI...",
+      "KARANTINA BASLATILDI...",
+      "GÜVENLIK DUVARI ÇÖKERTILDI...",
+      "!!! TEHLIKELI DURUM ALGILANDI !!!",
+    ];
 
-  <div id="term1" class="terminalBox"></div>
-  <div id="term2" class="terminalBox"></div>
-  <div id="term3" class="terminalBox"></div>
-  <div id="term4" class="terminalBox"></div>
-</div>
+    function randomLine() {
+      return scaryLines[Math.floor(Math.random() * scaryLines.length)];
+    }
 
-<div id="errorOverlay" style="display:none;">
-  <div id="errorText">ERROR</div>
-</div>
+    function printLine(line, delay) {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          terminal.innerText += line + "\n";
+          terminal.scrollTop = terminal.scrollHeight;
+          resolve();
+        }, delay);
+      });
+    }
 
-<div id="exclamations"></div>
+    async function startSimulation() {
+      intro.style.display = "none";
+      terminal.style.display = "block";
 
-<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg" preload="auto"></audio>
+      const totalDuration = 25000; // Yazıların süresi (5 saniyeden sonra 25 saniye)
+      const lineDelay = 50;
+      const lineCount = totalDuration / lineDelay;
 
-<script>
-(() => {
-  const introBox = document.getElementById('introBox');
-  const closeBtn = document.getElementById('closeBtn');
-  const terminalBg = document.getElementById('terminalBg');
-  const redLines = document.getElementById('redLines');
-  const greenLines = document.getElementById('greenLines');
-  const whiteLines = document.getElementById('whiteLines');
-  const term1 = document.getElementById('term1');
-  const term2 = document.getElementById('term2');
-  const term3 = document.getElementById('term3');
-  const term4 = document.getElementById('term4');
-  const errorOverlay = document.getElementById('errorOverlay');
-  const errorText = document.getElementById('errorText');
-  const exclamations = document.getElementById('exclamations');
-  const beepSound = document.getElementById('beepSound');
-
-  let beepInterval = null;
-  let soundOn = true;
-  let started = false;
-
-  const horrorTexts = [
-    "Sistem çöktü!",
-    "Erişim reddedildi!",
-    "Veriler sızdırıldı!",
-    "Güvenlik ihlali tespit edildi!",
-    "Sunucu tehlikede!",
-    "Kritik hata oluştu!",
-    "Şifre kırıldı!",
-    "Hedef ele geçirildi!",
-    "Firewall devre dışı!",
-    "Backdoor açıldı!",
-    "Sistem kapanıyor...",
-    "Zararlı yazılım bulaştı!",
-    "Şüpheli giriş algılandı!",
-    "Saldırı devam ediyor!",
-    "Loglar siliniyor!",
-    "Veri tabanı hasar gördü!",
-    "İnternet kesildi!",
-    "Sistem yeniden başlatılıyor!",
-    "Parola kırıldı!",
-    "Hedef sunucu çöktü!",
-  ];
-
-  function getRandomHorrorText() {
-    return horrorTexts[Math.floor(Math.random() * horrorTexts.length)];
-  }
-
-  // 1. intro ve çarpı butonu
-  closeBtn.addEventListener('click', () => {
-    if (started) {
-      // Ses aç/kapa
-      if (soundOn) {
-        soundOn = false;
-        stopBeeps();
-      } else {
-        soundOn = true;
-        startBeeps();
+      for (let i = 0; i < lineCount; i++) {
+        await printLine(randomLine(), lineDelay);
       }
-      return;
+
+      terminal.style.display = "none";
+      errorScreen.style.display = "block";
     }
-    started = true;
-    introBox.style.display = 'none';
-    terminalBg.style.display = 'block';
-    startTerminalSequence();
-  });
 
-  // Yazı üretici (rastgele harf, rakam, noktalama)
-  const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+-=[]{}|;':,.<>/?`~";
-
-  function randomChar() {
-    return chars.charAt(Math.floor(Math.random() * chars.length));
-  }
-
-  // Yazı satırı üretici
-  function generateLine(length) {
-    let line = "";
-    for(let i=0; i<length; i++) {
-      line += randomChar();
-    }
-    return line;
-  }
-
-  // Hızlı yazı akışı fonksiyonu
-  function startLineStream(element, totalLines, colorOrder, intervalMs=10) {
-    let lineCount = 0;
-    const linesPerColor = Math.floor(totalLines / colorOrder.length);
-    let colors = colorOrder.slice();
-    let currentColorIndex = 0;
-    let currentColorLinesWritten = 0;
-
-    function writeLine() {
-      if (
+    // 5 saniye sonra yazılar başlasın
+    setTimeout(startSimulation, 5000);
+  </script>
+</body>
+</html>
