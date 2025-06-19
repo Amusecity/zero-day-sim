@@ -1,147 +1,154 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Sahte Terminal</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Korku Terminali</title>
 <style>
   body {
     margin: 0;
-    background: black;
+    background-color: black;
     font-family: monospace;
     overflow: hidden;
+    color: #0f0;
   }
   #intro {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 50%; left: 50%;
     transform: translate(-50%, -50%);
     font-size: 3em;
-    padding: 20px;
     border: 2px solid #0f0;
-    color: #0f0;
-    animation: blinkIntro 0.5s infinite;
+    padding: 20px;
+    animation: greenBlink 1s infinite;
   }
-  @keyframes blinkIntro {
-    0%, 50%, 100% { opacity: 1; }
-    25%, 75% { opacity: 0; }
+  @keyframes greenBlink {
+    0%, 100% {opacity: 1;}
+    50% {opacity: 0;}
+  }
+  @keyframes redBlink {
+    0%, 100% {color: red; border-color: red; opacity: 1;}
+    50% {opacity: 0;}
   }
   #terminal {
     display: none;
-    height: 100vh;
-    overflow-y: auto;
-    padding: 20px;
-    font-size: 16px;
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+    overflow-y: scroll;
     color: red;
-    white-space: pre-wrap;
+    font-size: 1.2em;
+    background-color: black;
   }
-  #finalError {
+  #final {
     display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%) scale(0.5);
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background-color: red;
+    animation: flash 0.2s infinite alternate;
+    z-index: 10;
+  }
+  @keyframes flash {
+    0% { background-color: red; }
+    100% { background-color: black; }
+  }
+  #errorText {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
     font-size: 6em;
     font-weight: bold;
     color: red;
-    text-align: center;
-    z-index: 9999;
-    animation: pulseError 0.3s infinite alternate ease-in-out;
+    animation: pulse 0.3s infinite;
+    z-index: 11;
   }
-  @keyframes pulseError {
-    0% { opacity: 0; transform: translate(-50%, -50%) scale(0.5); }
-    50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
-    100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+  @keyframes pulse {
+    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
+    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
   }
-  #screenFlash {
-    display: none;
-    position: fixed;
-    top:0; left:0;
-    width:100%; height:100%;
-    background: red;
-    z-index: 9998;
-    animation: flashScreen 0.2s infinite alternate;
+  .boom {
+    position: absolute;
+    color: red;
+    font-size: 2em;
+    animation: explode 0.5s infinite;
   }
-  @keyframes flashScreen {
-    from { background: red; }
-    to { background: black; }
+  @keyframes explode {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
   }
 </style>
 </head>
 <body>
-  <div id="intro">@mhmtxaslan</div>
-  <div id="terminal"></div>
-  <div id="screenFlash"></div>
-  <div id="finalError">ERÖR</div>
+<div id="intro">@mhmtxaslan</div>
+<div id="terminal"></div>
+<div id="final">
+  <div id="errorText">ERÖR</div>
+</div>
 
-  <script>
-    const intro = document.getElementById("intro");
-    const terminal = document.getElementById("terminal");
-    const screenFlash = document.getElementById("screenFlash");
-    const finalError = document.getElementById("finalError");
+<script>
+  const intro = document.getElementById("intro");
+  const terminal = document.getElementById("terminal");
+  const final = document.getElementById("final");
+  const errorText = document.getElementById("errorText");
 
-    const lines = [
-      "SISTEM GIRISI ALGILANDI...",
-      "ROOT IZNI KAZANILDI...",
-      "FIREWALL BAYPAS EDILDI...",
-      "VERILER COPLANDI...",
-      "KULLANICI DETAYLARI ÇÖZÜLDÜ...",
-      "MASKENIN ALTINDA SIZMA...",
-      "SIZMA TAMAMLANIYOR...",
-      "IPLER DEGISIYOR...",
-      "ZAMANLAYICI AKTIFLESTIRILDI...",
-      "TEHDIT MODU DEVREYE GIRDI...",
-      "VERI TASIMASI BASLADI...",
-      "PROTOKOL RIOT: 0xDEAD...",
-      "SISTEM TEHLIKELI DURUMA GECTI..."
-    ];
+  const scaryLines = [
+    "SİSTEME SIZILIYOR...",
+    "KONTROL KAYBEDİLDİ...",
+    "GÜVENLİK DELİNDİ...",
+    "VİRÜS AKTİF!",
+    "YÜKLENİYOR >>>> 0xDEAD",
+    "UYARI: KONTROL YOK",
+    "BELLEK AŞIMI YAŞANIYOR...",
+    "BİLGİLERİNİZ KOPYALANDI!",
+    "TÜM DOSYALARINIZ TEHLİKEDE...",
+    "İZLENİYORSUNUZ...",
+    "KAÇIŞ YOK...",
+    "ÇÖKÜYOR... ████████"
+  ];
 
-    function changeToRedBlinking() {
-      intro.style.borderColor = "red";
-      intro.style.color = "red";
-      intro.style.animation = "blinkIntro 0.2s infinite";
+  function startHack() {
+    intro.style.animation = "redBlink 0.1s infinite";
+    intro.style.color = "red";
+    intro.style.borderColor = "red";
+  }
+
+  function startTerminal() {
+    intro.remove();
+    terminal.style.display = "block";
+    let index = 0;
+    const interval = setInterval(() => {
+      const line = scaryLines[Math.floor(Math.random() * scaryLines.length)];
+      const div = document.createElement("div");
+      div.textContent = line;
+      terminal.appendChild(div);
+      terminal.scrollTop = terminal.scrollHeight;
+      index++;
+      if (index > 200) clearInterval(interval);
+    }, 100);
+  }
+
+  function showFinal() {
+    terminal.remove();
+    final.style.display = "block";
+
+    // Ünlem efektleri
+    for (let i = 0; i < 40; i++) {
+      const el = document.createElement("div");
+      el.className = "boom";
+      el.textContent = "!";
+      el.style.top = Math.random() * 100 + "%";
+      el.style.left = Math.random() * 100 + "%";
+      final.appendChild(el);
     }
+  }
 
-    function randomLine() {
-      return lines[Math.floor(Math.random() * lines.length)];
-    }
-
-    function printLine(line, delay) {
-      return new Promise(res => {
-        setTimeout(() => {
-          const div = document.createElement("div");
-          div.textContent = line;
-          terminal.appendChild(div);
-          terminal.scrollTop = terminal.scrollHeight;
-          res();
-        }, delay);
-      });
-    }
-
-    async function startTerminal() {
-      intro.style.display = "none";
-      terminal.style.display = "block";
-
-      const totalDuration = 20000; // 20s
-      const lineDelay = 100; // hızlı
-      const count = totalDuration / lineDelay;
-
-      for (let i = 0; i < count; i++) {
-        await printLine(randomLine(), lineDelay);
-      }
-
-      terminal.style.display = "none";
-      screenFlash.style.display = "block";
-      finalError.style.display = "block";
-
-      setTimeout(() => {
-        screenFlash.style.display = "none";
-      }, 3000);
-    }
-
-    setTimeout(changeToRedBlinking, 2000);
-    setTimeout(startTerminal, 5000);
-
-  </script>
+  // TİMİNG
+  setTimeout(startHack, 2000);     // 2.saniye: kırmızıya geç
+  setTimeout(startTerminal, 5000); // 5.saniye: yazılar başlasın
+  setTimeout(showFinal, 25000);    // 25.saniye: ERÖR ve patlama
+</script>
 </body>
 </html>
