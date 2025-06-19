@@ -163,8 +163,8 @@
   const alarmSound = document.getElementById('alarm');
   const beepSound = document.getElementById('beep');
 
-  // Yazılar, farklı renklerde ve içeriklerde
-  const textPoolMain = [
+  // İlk kutu için yazılar (harf harf yazılacak)
+  const typingTexts = [
     "Bağlantı kuruluyor...",
     "Veri paketi alınıyor...",
     "Şifre çözülüyor...",
@@ -175,24 +175,9 @@
     "Sunucuya sızıldı...",
     "Veri akışı sağlanıyor...",
     "Komutlar işleniyor...",
-    "Saldırı başlatıldı...",
-    "Gizlilik ihlali tespit edildi...",
-    "Portlar açık...",
-    "Ağ trafiği analiz ediliyor...",
-    "Proxy kullanılıyor...",
-    "Anonim bağlantı aktif...",
-    "Payload yükleniyor...",
-    "Parola kırılıyor...",
-    "Kilit açılıyor...",
-    "Güvenlik duvarı devre dışı...",
-    "Dosyalar şifreleniyor...",
-    "Dizin erişimi genişletiliyor...",
-    "Sistem hatası oluştu...",
-    "Acil durum modu aktif...",
-    "İşlem tamamlandı...",
   ];
 
-  // Diğer kutular için farklı kelimeler
+  // Diğer kutular için yazılar (sürekli akan)
   const textPoolBoxes = [
     ["init db... ok", "syncing logs...", "auth ok", "loading modules...", "cleanup temp files..."],
     ["user admin logged in", "privilege escalated", "port 443 open", "dns spoof detected", "firewall bypassed"],
@@ -200,29 +185,50 @@
     ["upload payload", "execute shell", "download data", "delete logs", "disconnecting..."]
   ];
 
-  // Renkler
+  // Renkler sadece kırmızı, yeşil ve beyaz olacak
   const colors = ['green', 'red', 'white'];
 
-  // Animasyon ayarları
   let intervalIds = [];
   let beepInterval;
   let isRunning = false;
   let errorShown = false;
 
-  // Yazıların sürekli akması için fonksiyon
-  function startTextFlow(element, texts, speed, colorClass) {
-    let idx = 0;
+  // Harf harf yazdırma fonksiyonu (async)
+  async function typeWriter(element, text, speed) {
+    for(let i=0; i<text.length; i++) {
+      const span = document.createElement('span');
+      // Renk rastgele
+      const color = colors[Math.floor(Math.random() * colors.length)];
+      span.className = color;
+      span.textContent = text[i];
+      element.appendChild(span);
+      element.scrollTop = element.scrollHeight;
+      await new Promise(r => setTimeout(r, speed));
+    }
+    // Yeni satır
+    element.appendChild(document.createElement('br'));
+    element.scrollTop = element.scrollHeight;
+  }
+
+  // İlk kutuda harf harf yazdırma animasyonu (10 saniye boyunca)
+  async function runTypingAnimation(element, texts, duration) {
+    const endTime = Date.now() + duration;
+    while (Date.now() < endTime) {
+      const text = texts[Math.floor(Math.random() * texts.length)];
+      await typeWriter(element, text, 50);
+    }
+  }
+
+  // Sürekli akan yazı animasyonu
+  function startTextFlow(element, texts, speed) {
     return setInterval(() => {
-      // Yeni satır ekle
       const line = texts[Math.floor(Math.random() * texts.length)];
       const color = colors[Math.floor(Math.random() * colors.length)];
       const span = document.createElement('span');
       span.textContent = line + '\n';
-      span.className = colorClass || color;
+      span.className = color;
       element.appendChild(span);
-      // Scroll en alta
       element.scrollTop = element.scrollHeight;
-      // Limit aşarsa eski satırları sil (100 satırdan fazla olmasın)
       while (element.childNodes.length > 120) {
         element.removeChild(element.firstChild);
       }
@@ -242,7 +248,7 @@
   }
 
   // Başlangıç butonu
-  startButton.onclick = () => {
+  startButton.onclick = async () => {
     if (isRunning) return;
     isRunning = true;
 
@@ -252,41 +258,39 @@
     // @mhmtxaslan yazısını göster
     startName.style.display = 'block';
 
-    // 3 saniye sonra @mhmtxaslan kaybolur, mainBox açılır ve yazılar akmaya başlar
+        // 3 saniye sonra harf harf yazılar başlasın
+    await new Promise(r => setTimeout(r, 3000));
+    startName.style.display = 'none';
+    mainBox.style.display = 'block';
+
+    // Harf harf yazılar (10 saniye)
+    await runTypingAnimation(mainBox, typingTexts, 50);
+
+    // 10 saniye sonra kutular görünmeye başlasın ve yazılar aksın
+    boxes.forEach((box, i) => {
+      setTimeout(() => {
+        box.style.display = 'block';
+        intervalIds.push(startTextFlow(box, textPoolBoxes[i], 100));
+      }, i * 1000);
+    });
+
+    // 45. saniyede ERROR ekranı ve alarm
     setTimeout(() => {
-      startName.style.display = 'none';
-      mainBox.style.display = 'block';
-
-      // Main kutuda yazılar başlasın
-      intervalIds.push(startTextFlow(mainBox, textPoolMain, 60));
-
-      // 1 saniye sonra diğer kutular ardışık açılıp yazmaya başlasın
-      boxes.forEach((box, i) => {
-        setTimeout(() => {
-          box.style.display = 'block';
-          intervalIds.push(startTextFlow(box, textPoolBoxes[i], 40));
-        }, 1000 * (i + 1));
-      });
-
-      // Alarm ve bip başlat
+      if (errorShown) return;
+      errorShown = true;
+      boxes.forEach(box => box.style.display = 'none');
+      mainBox.style.display = 'none';
+      errorScreen.style.display = 'flex';
       alarmSound.play();
       startBeep();
+    }, 45000); // 45. saniyede final
 
-      // 50 saniye sonra ERROR ekranını göster
-      setTimeout(() => {
-        errorScreen.style.display = 'flex';
-        errorShown = true;
-        // Alarm devam eder, bip devam eder
-      }, 50000);
-
-      // 60 saniye sonra işlemi durdur (ama yazılar akmaya devam eder)
-      setTimeout(() => {
-        // Burada herhangi bir şey durdurulmuyor, yazılar akmaya devam edecek.
-        // Sadece animasyon tamamlandı diye düşünebilirsin.
-      }, 60000);
-    }, 3000);
+    // 60. saniyede durdur (isteğe bağlı olarak)
+    setTimeout(() => {
+      alarmSound.pause();
+      stopBeep();
+    }, 60000); // 60 saniyede kapanırsa
   };
-
 </script>
 </body>
 </html>
