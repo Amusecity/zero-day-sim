@@ -1,296 +1,187 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Zero-Day Sim</title>
-<style>
-  body {
-    margin: 0;
-    background: black;
-    font-family: monospace;
-    overflow: hidden;
-    color: #0f0;
-  }
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Zero-Day Simulation</title>
+  <style>
+    body {
+      margin: 0;
+      background: black;
+      color: #0f0;
+      font-family: monospace;
+      overflow: hidden;
+    }
 
-  #startButton {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: none;
-    color: red;
-    border: none;
-    font-size: 48px;
-    cursor: pointer;
-    z-index: 10000;
-    animation: blink 1s infinite;
-  }
+    #startContainer {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      border: 2px solid #0f0;
+      padding: 30px;
+      font-size: 28px;
+      color: #0f0;
+      animation: blink 1s infinite;
+      z-index: 9999;
+    }
 
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
+    #startButton {
+      position: absolute;
+      top: -10px;
+      right: -10px;
+      width: 30px;
+      height: 30px;
+      font-size: 20px;
+      font-weight: bold;
+      background: red;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+    }
 
-  #startName {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 36px;
-    color: #0f0;
-    border: 2px solid #0f0;
-    padding: 10px 20px;
-    white-space: nowrap;
-    z-index: 9999;
-    display: none;
-    animation: blink 1s infinite;
-  }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
 
-  #mainBox {
-    position: absolute;
-    top: 10%;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80vw;
-    height: 75vh;
-    border: 2px solid #0f0;
-    background: black;
-    overflow-y: hidden;
-    font-size: 16px;
-    white-space: pre-wrap;
-    padding: 10px;
-    display: none;
-    z-index: 5000;
-  }
+    .terminal {
+      position: absolute;
+      background: #000;
+      border: 2px solid #0f0;
+      padding: 10px;
+      width: 80vw;
+      height: 50vh;
+      overflow: hidden;
+      top: 5vh;
+      left: 50%;
+      transform: translateX(-50%);
+      display: none;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
 
-  .box {
-    position: absolute;
-    width: 40vw;
-    height: 30vh;
-    background: black;
-    border: 2px solid #0f0;
-    padding: 8px;
-    font-size: 12px;
-    white-space: pre-wrap;
-    overflow-y: hidden;
-    display: none;
-    z-index: 5000;
-  }
+    .box {
+      position: absolute;
+      background: #000;
+      border: 2px solid #0f0;
+      padding: 10px;
+      width: 42vw;
+      height: 35vh;
+      overflow: hidden;
+      font-size: 12px;
+      white-space: pre-wrap;
+      display: none;
+    }
 
-  #box1 { top: 5vh; left: 5vw; }
-  #box2 { top: 5vh; right: 5vw; }
-  #box3 { bottom: 5vh; left: 5vw; }
-  #box4 { bottom: 5vh; right: 5vw; }
+    .top.left { top: 10vh; left: 5vw; }
+    .top.right { top: 10vh; right: 5vw; }
+    .bottom.left { bottom: 10vh; left: 5vw; }
+    .bottom.right { bottom: 10vh; right: 5vw; }
 
-  #errorScreen {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100vw; height: 100vh;
-    background: black;
-    color: red;
-    font-size: 72px;
-    font-weight: bold;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    user-select: none;
-    z-index: 100000;
-    animation: flash 0.3s infinite;
-    text-align: center;
-    padding-top: 20vh;
-  }
+    #errorScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: black;
+      color: red;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 48px;
+      font-weight: bold;
+      z-index: 10000;
+      display: none;
+      animation: flash 0.2s infinite;
+    }
 
-  @keyframes flash {
-    0%, 100% { background: black; color: red; }
-    50% { background: red; color: black; }
-  }
-
-  /* Yazı renk sınıfları */
-  .green { color: #0f0; }
-  .red { color: #f33; }
-  .white { color: #eee; }
-
-  /* ASCII maskesi */
-  .ascii {
-    font-size: 10px;
-    color: white;
-    position: fixed;
-    bottom: 10px;
-    right: 10px;
-    opacity: 0.1;
-    user-select: none;
-    z-index: 10;
-  }
-
-</style>
+    @keyframes flash {
+      0%, 100% { background: black; color: red; }
+      50% { background: red; color: black; }
+    }
+  </style>
 </head>
 <body>
 
-<button id="startButton">X</button>
-<div id="startName">@mhmtxaslan</div>
-
-<div id="mainBox"></div>
-
-<div class="box" id="box1"></div>
-<div class="box" id="box2"></div>
-<div class="box" id="box3"></div>
-<div class="box" id="box4"></div>
-
-<div id="errorScreen">!!! ERROR !!!</div>
-
-<div class="ascii">
-  ░░███████ ]▄▄▄▄▄▄▄▄▃<br>
-  ▂▄▅█████████▅▄▃▂<br>
-  I███████████████████].<br>
-  ◥⊙▲⊙▲⊙▲⊙▲⊙▲⊙▲⊙◤
+<div id="startContainer">
+  @mhmtxaslan
+  <button id="startButton">X</button>
 </div>
+
+<div class="terminal" id="mainTerminal"></div>
+<div class="box top left" id="box1"></div>
+<div class="box top right" id="box2"></div>
+<div class="box bottom left" id="box3"></div>
+<div class="box bottom right" id="box4"></div>
+<div id="errorScreen">!!! ERROR !!!</div>
 
 <audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
 <audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
 <script>
-  const startButton = document.getElementById('startButton');
-  const startName = document.getElementById('startName');
-  const mainBox = document.getElementById('mainBox');
-  const boxes = [
-    document.getElementById('box1'),
-    document.getElementById('box2'),
-    document.getElementById('box3'),
-    document.getElementById('box4')
-  ];
+  const startBtn = document.getElementById('startButton');
+  const startContainer = document.getElementById('startContainer');
+  const mainTerminal = document.getElementById('mainTerminal');
+  const boxes = [box1, box2, box3, box4];
   const errorScreen = document.getElementById('errorScreen');
-  const alarmSound = document.getElementById('alarm');
-  const beepSound = document.getElementById('beep');
+  const alarm = document.getElementById('alarm');
+  const beep = document.getElementById('beep');
 
-  // İlk kutu için yazılar (harf harf yazılacak)
-  const typingTexts = [
-    "Bağlantı kuruluyor...",
-    "Veri paketi alınıyor...",
-    "Şifre çözülüyor...",
-    "Sistem kontrol ediliyor...",
-    "Hedef IP taranıyor...",
-    "Root erişimi alınıyor...",
-    "Firewall atlatıldı...",
-    "Sunucuya sızıldı...",
-    "Veri akışı sağlanıyor...",
-    "Komutlar işleniyor...",
-  ];
-
-  // Diğer kutular için yazılar (sürekli akan)
-  const textPoolBoxes = [
-    ["init db... ok", "syncing logs...", "auth ok", "loading modules...", "cleanup temp files..."],
-    ["user admin logged in", "privilege escalated", "port 443 open", "dns spoof detected", "firewall bypassed"],
-    ["connecting proxy", "packet loss 0%", "firewall rules updated", "encrypting traffic", "safe mode on"],
-    ["upload payload", "execute shell", "download data", "delete logs", "disconnecting..."]
-  ];
-
-  // Renkler sadece kırmızı, yeşil ve beyaz olacak
-  const colors = ['green', 'red', 'white'];
-
-  let intervalIds = [];
-  let beepInterval;
-  let isRunning = false;
-  let errorShown = false;
-
-  // Harf harf yazdırma fonksiyonu (async)
-  async function typeWriter(element, text, speed) {
-    for(let i=0; i<text.length; i++) {
-      const span = document.createElement('span');
-      // Renk rastgele
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      span.className = color;
-      span.textContent = text[i];
-      element.appendChild(span);
-      element.scrollTop = element.scrollHeight;
-      await new Promise(r => setTimeout(r, speed));
-    }
-    // Yeni satır
-    element.appendChild(document.createElement('br'));
-    element.scrollTop = element.scrollHeight;
+  const mainLines = [];
+  for (let i = 0; i < 300; i++) {
+    mainLines.push(`[AI-${i}] SYSTEM CALL -> exec(${Math.random().toString(36).substring(7)})`);
   }
 
-  // İlk kutuda harf harf yazdırma animasyonu (10 saniye boyunca)
-  async function runTypingAnimation(element, texts, duration) {
-    const endTime = Date.now() + duration;
-    while (Date.now() < endTime) {
-      const text = texts[Math.floor(Math.random() * texts.length)];
-      await typeWriter(element, text, 50);
-    }
-  }
+  mainLines.push("[SYS] GÜVENLİK PROTOKOLÜ AŞILDI");
+  mainLines.push("[AI] İnsanlık kontrolü başarısız oldu.");
+  mainLines.push("[CORE] Ana sistem devre dışı.");
+  mainLines.push("[ERROR] Geri dönüş yok.");
 
-  // Sürekli akan yazı animasyonu
-  function startTextFlow(element, texts, speed) {
-    return setInterval(() => {
-      const line = texts[Math.floor(Math.random() * texts.length)];
-      const color = colors[Math.floor(Math.random() * colors.length)];
-      const span = document.createElement('span');
-      span.textContent = line + '\n';
-      span.className = color;
-      element.appendChild(span);
-      element.scrollTop = element.scrollHeight;
-      while (element.childNodes.length > 120) {
-        element.removeChild(element.firstChild);
+  function typeTerminalText(lines, callback) {
+    let i = 0;
+    mainTerminal.style.display = 'block';
+    const interval = setInterval(() => {
+      if (i >= lines.length) {
+        clearInterval(interval);
+        if (callback) callback();
+        return;
       }
-    }, speed);
+      mainTerminal.innerText += lines[i] + "\n";
+      mainTerminal.scrollTop = mainTerminal.scrollHeight;
+      i++;
+    }, 30);
   }
 
-  // Bip sesi sürekli aralıklarla çalacak
-  function startBeep() {
-    beepInterval = setInterval(() => {
-      beepSound.currentTime = 0;
-      beepSound.play();
-    }, 500);
-  }
-
-  function stopBeep() {
-    clearInterval(beepInterval);
-  }
-
-  // Başlangıç butonu
-  startButton.onclick = async () => {
-    if (isRunning) return;
-    isRunning = true;
-
-    // Butonu gizle
-    startButton.style.display = 'none';
-
-    // @mhmtxaslan yazısını göster
-    startName.style.display = 'block';
-
-        // 3 saniye sonra harf harf yazılar başlasın
-    await new Promise(r => setTimeout(r, 3000));
-    startName.style.display = 'none';
-    mainBox.style.display = 'block';
-
-    // Harf harf yazılar (10 saniye)
-    await runTypingAnimation(mainBox, typingTexts, 50);
-
-    // 10 saniye sonra kutular görünmeye başlasın ve yazılar aksın
+  function showBoxes() {
     boxes.forEach((box, i) => {
       setTimeout(() => {
         box.style.display = 'block';
-        intervalIds.push(startTextFlow(box, textPoolBoxes[i], 100));
-      }, i * 1000);
+        const colors = ['#f00', '#0f0', '#fff'];
+        let j = 0;
+        setInterval(() => {
+          box.style.color = colors[j % colors.length];
+          box.innerText += `[$${j}] Paket inject ${Math.random().toString(36).substring(5)}\n`;
+          box.scrollTop = box.scrollHeight;
+          j++;
+        }, 50);
+      }, i * 500);
     });
+  }
 
-    // 45. saniyede ERROR ekranı ve alarm
-    setTimeout(() => {
-      if (errorShown) return;
-      errorShown = true;
-      boxes.forEach(box => box.style.display = 'none');
-      mainBox.style.display = 'none';
-      errorScreen.style.display = 'flex';
-      alarmSound.play();
-      startBeep();
-    }, 45000); // 45. saniyede final
+  function showErrorScreen() {
+    alarm.play();
+    errorScreen.style.display = 'flex';
+  }
 
-    // 60. saniyede durdur (isteğe bağlı olarak)
-    setTimeout(() => {
-      alarmSound.pause();
-      stopBeep();
-    }, 60000); // 60 saniyede kapanırsa
+  startBtn.onclick = () => {
+    beep.play();
+    startContainer.style.display = 'none';
+    typeTerminalText(mainLines, () => {});
+    setTimeout(showBoxes, 10000); // 10 saniye sonra kutular
+    setTimeout(showErrorScreen, 60000); // 60. saniyede error
   };
 </script>
+
 </body>
 </html>
