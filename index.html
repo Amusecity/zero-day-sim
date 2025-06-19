@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zero-Day Sim</title>
+  <title>Sahte Terminal</title>
   <style>
     body {
       margin: 0;
       background: black;
-      color: lime;
       font-family: monospace;
       overflow: hidden;
+      color: red;
     }
 
     #intro {
@@ -19,78 +19,126 @@
       left: 50%;
       transform: translate(-50%, -50%);
       font-size: 3em;
-      color: red;
-      border: 2px solid red;
       padding: 20px;
-      animation: blink 1s infinite;
+      border: 2px solid #00ff00;
+      color: #00ff00;
+      animation: blinkIntro 1s infinite;
     }
 
-    @keyframes blink {
-      0%, 50%, 100% { opacity: 1; }
-      25%, 75% { opacity: 0; }
+    @keyframes blinkIntro {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.3; }
     }
 
     #terminal {
       display: none;
+      height: 100vh;
+      overflow-y: auto;
       padding: 20px;
+      font-size: 16px;
+      color: red;
       white-space: pre-wrap;
-      color: #00ff00;
-      font-size: 14px;
     }
 
-    #errorScreen {
+    #errorBox {
       display: none;
       position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: black;
+      top: 30%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 300px;
+      height: 200px;
+      border: 5px solid red;
       color: red;
-      font-size: 5em;
+      font-size: 2em;
       font-weight: bold;
-      text-align: center;
-      animation: flash 0.5s infinite;
+      background: black;
       z-index: 9999;
-      padding-top: 20%;
+      text-align: center;
+      animation: flashBox 0.5s infinite;
     }
 
-    @keyframes flash {
-      0%, 100% { background: black; color: red; }
-      50% { background: red; color: black; }
+    @keyframes flashBox {
+      0%, 100% { background: black; color: red; border-color: red; }
+      50% { background: red; color: black; border-color: black; }
+    }
+
+    .exclamations {
+      font-size: 2em;
+      animation: blinkEx 0.3s infinite alternate;
+    }
+
+    @keyframes blinkEx {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+
+    #finalMessage {
+      display: none;
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: black;
+      color: red;
+      font-size: 1.5em;
+      padding: 10px;
+      text-align: center;
+      border-top: 2px solid red;
+      animation: scrollText 10s linear infinite;
+    }
+
+    @keyframes scrollText {
+      0% { transform: translateX(100%); }
+      100% { transform: translateX(-100%); }
     }
   </style>
 </head>
 <body>
   <div id="intro">@mhmtxaslan</div>
   <div id="terminal"></div>
-  <div id="errorScreen">!!! ERROR !!!</div>
+  <div id="errorBox">
+    <div class="exclamations">!!!</div>
+    <div>ERROR</div>
+    <div class="exclamations">!!!</div>
+  </div>
+  <div id="finalMessage">ERROR — @mhmtxaslan takipte kal ;)</div>
 
   <script>
     const intro = document.getElementById("intro");
     const terminal = document.getElementById("terminal");
-    const errorScreen = document.getElementById("errorScreen");
+    const errorBox = document.getElementById("errorBox");
+    const finalMessage = document.getElementById("finalMessage");
 
     const scaryLines = [
-      "SISTEM GIRISI ALGILANDI...",
-      "ROOT YETKISI ALINDI...",
-      "FIREWALL BAYPAS EDILDI...",
-      "SIFRELER ÇÖZÜLDÜ...",
-      "VERILER SIZDIRILIYOR...",
-      "KULLANICI OTURUMU KOPYALANIYOR...",
-      "ÇEKIRDEK YAZILIM HATASI...",
-      "TROJAN YÜKLENDI...",
-      "SISTEM MANUEL MODA GEÇTI...",
-      "GÖRÜNMEZLIK MODU AKTIF...",
-      "LOG DOSYALARI SILINIYOR...",
-      "UZAKTAN BAGLANTI BASLATILDI...",
-      "ANA MAKINE IP: 127.0.0.1",
-      "DESTEK KOD: 0x00F1DEAD",
-      "DOSYA SISTEMI KIRILIYOR...",
-      "ZAMANLAYICI ETKINLESTIRILDI...",
-      "KONTROL TAMAMLANDI...",
-      "KARANTINA BASLATILDI...",
-      "GÜVENLIK DUVARI ÇÖKERTILDI...",
-      "!!! TEHLIKELI DURUM ALGILANDI !!!",
+      "GÖRÜNTÜ DOSYALARI BOZULDU...",
+      "KULLANICI VERISI KOPYALANDI...",
+      "BILINMEYEN IP BAGLANTISI ALGILANDI...",
+      "SISTEM IÇINE SIZILDI...",
+      "ÇEKIRDEK HATASI TESPIT EDILDI...",
+      "UZAK SUNUCUYA BAGLANTI BASLATILDI...",
+      "GÜVENLIK PROTOKOLLERI ÇÖKERTILDI...",
+      "VERI TABANI PARÇALANIYOR...",
+      "KRITIK MOD AKTIFLESTIRILDI...",
+      "KARANLIK MODUL YÜKLENDI...",
+      "DOSYA SISTEMI FORMATLANIYOR...",
+      "KULLANICI TAKIPI AKTIF...",
+      "FIREWALL TESPIT EDEMEDI...",
+      "GERI DÖNÜŞÜMSÜZ HASAR VERILIYOR...",
+      "SIZMA TAMAMLANDI...",
+      "PROTOKOL 0xF3R0R CALISTIRILIYOR...",
+      "SANSÜR KALDIRILDI...",
+      "YETKILER YOK EDILIYOR...",
+      "GÖZETIM MODU BASLATILDI...",
+      "!!! SISTEM TEHLIKEDE !!!"
     ];
+
+    function changeIntroColor() {
+      setTimeout(() => {
+        intro.style.color = "red";
+        intro.style.borderColor = "red";
+      }, 2000);
+    }
 
     function randomLine() {
       return scaryLines[Math.floor(Math.random() * scaryLines.length)];
@@ -99,19 +147,21 @@
     function printLine(line, delay) {
       return new Promise(resolve => {
         setTimeout(() => {
-          terminal.innerText += line + "\n";
+          const span = document.createElement("div");
+          span.textContent = line;
+          terminal.appendChild(span);
           terminal.scrollTop = terminal.scrollHeight;
           resolve();
         }, delay);
       });
     }
 
-    async function startSimulation() {
+    async function startTerminal() {
       intro.style.display = "none";
       terminal.style.display = "block";
 
-      const totalDuration = 25000; // Yazıların süresi (5 saniyeden sonra 25 saniye)
-      const lineDelay = 50;
+      const totalDuration = 20000; // 20 saniyede yazılar aksın
+      const lineDelay = 150;
       const lineCount = totalDuration / lineDelay;
 
       for (let i = 0; i < lineCount; i++) {
@@ -119,11 +169,17 @@
       }
 
       terminal.style.display = "none";
-      errorScreen.style.display = "block";
+      errorBox.style.display = "block";
+
+      // 5 saniye sonra ERROR kapanır, final mesaj başlar
+      setTimeout(() => {
+        errorBox.style.display = "none";
+        finalMessage.style.display = "block";
+      }, 5000);
     }
 
-    // 5 saniye sonra yazılar başlasın
-    setTimeout(startSimulation, 5000);
+    changeIntroColor();
+    setTimeout(startTerminal, 5000); // Başlatma
   </script>
 </body>
 </html>
