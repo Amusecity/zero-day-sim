@@ -1,187 +1,244 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Zero-Day Simulation</title>
-  <style>
-    body {
-      margin: 0;
-      background: black;
-      color: #0f0;
-      font-family: monospace;
-      overflow: hidden;
-    }
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Zero-Day Sim</title>
+<style>
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    background: black;
+    font-family: monospace;
+    overflow: hidden;
+    color: #0f0;
+  }
+  #overlay {
+    position: fixed;
+    top:0; left:0; right:0; bottom:0;
+    background: black;
+    z-index: 99999;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+  }
+  #startName {
+    font-size: 48px;
+    border: 3px solid #0f0;
+    padding: 20px 40px;
+    margin-bottom: 30px;
+    animation: blink 1.2s infinite;
+    color: #0f0;
+  }
+  @keyframes blink {
+    0%,100% {opacity:1;}
+    50% {opacity: 0.3;}
+  }
+  #startBtn {
+    width: 80px; height: 80px;
+    border: 3px solid #0f0;
+    border-radius: 50%;
+    font-size: 48px;
+    color: #0f0;
+    background: black;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    transition: background-color 0.3s;
+  }
+  #startBtn:hover {
+    background: #0f0;
+    color: black;
+  }
 
-    #startContainer {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      border: 2px solid #0f0;
-      padding: 30px;
-      font-size: 28px;
-      color: #0f0;
-      animation: blink 1s infinite;
-      z-index: 9999;
-    }
+  #mainBox {
+    position: fixed;
+    top: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 1200px;
+    height: 50vh;
+    background: black;
+    border: 2px solid #0f0;
+    color: #0f0;
+    font-size: 16px;
+    overflow-y: auto;
+    padding: 12px;
+    white-space: pre-wrap;
+    z-index: 10000;
+    display: none;
+  }
 
-    #startButton {
-      position: absolute;
-      top: -10px;
-      right: -10px;
-      width: 30px;
-      height: 30px;
-      font-size: 20px;
-      font-weight: bold;
-      background: red;
-      color: white;
-      border: none;
-      border-radius: 50%;
-      cursor: pointer;
-    }
+  .boxes-container {
+    position: fixed;
+    bottom: 5vh;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;
+    max-width: 1200px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    z-index: 10000;
+    display: none;
+  }
+  .box {
+    background: black;
+    border: 2px solid;
+    color: #0f0;
+    width: 23%;
+    height: 35vh;
+    font-size: 14px;
+    overflow-y: auto;
+    padding: 10px;
+    white-space: pre-wrap;
+    font-weight: 700;
+    user-select: none;
+  }
+  .box.red {
+    border-color: #f00;
+    color: #f00;
+  }
+  .box.green {
+    border-color: #0f0;
+    color: #0f0;
+  }
+  .box.white {
+    border-color: #fff;
+    color: #fff;
+  }
 
-    @keyframes blink {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.4; }
-    }
-
-    .terminal {
-      position: absolute;
-      background: #000;
-      border: 2px solid #0f0;
-      padding: 10px;
-      width: 80vw;
-      height: 50vh;
-      overflow: hidden;
-      top: 5vh;
-      left: 50%;
-      transform: translateX(-50%);
-      display: none;
-      font-size: 14px;
-      white-space: pre-wrap;
-    }
-
-    .box {
-      position: absolute;
-      background: #000;
-      border: 2px solid #0f0;
-      padding: 10px;
-      width: 42vw;
-      height: 35vh;
-      overflow: hidden;
-      font-size: 12px;
-      white-space: pre-wrap;
-      display: none;
-    }
-
-    .top.left { top: 10vh; left: 5vw; }
-    .top.right { top: 10vh; right: 5vw; }
-    .bottom.left { bottom: 10vh; left: 5vw; }
-    .bottom.right { bottom: 10vh; right: 5vw; }
-
-    #errorScreen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: black;
-      color: red;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 48px;
-      font-weight: bold;
-      z-index: 10000;
-      display: none;
-      animation: flash 0.2s infinite;
-    }
-
-    @keyframes flash {
-      0%, 100% { background: black; color: red; }
-      50% { background: red; color: black; }
-    }
-  </style>
+  #errorScreen {
+    position: fixed;
+    top: 0; left:0; right:0; bottom:0;
+    background: black;
+    color: red;
+    font-size: 96px;
+    font-weight: 900;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    user-select: none;
+    z-index: 20000;
+    display: none;
+    animation: flashError 0.3s infinite alternate;
+  }
+  @keyframes flashError {
+    0% {color: red; background: black;}
+    50% {color: black; background: red;}
+    100% {color: red; background: black;}
+  }
+</style>
 </head>
 <body>
 
-<div id="startContainer">
-  @mhmtxaslan
-  <button id="startButton">X</button>
+<div id="overlay">
+  <div id="startName">@mhmtxaslan</div>
+  <button id="startBtn">X</button>
 </div>
 
-<div class="terminal" id="mainTerminal"></div>
-<div class="box top left" id="box1"></div>
-<div class="box top right" id="box2"></div>
-<div class="box bottom left" id="box3"></div>
-<div class="box bottom right" id="box4"></div>
+<div id="mainBox"></div>
+
+<div class="boxes-container" id="boxesContainer">
+  <div class="box red" id="box1"></div>
+  <div class="box green" id="box2"></div>
+  <div class="box white" id="box3"></div>
+  <div class="box red" id="box4"></div>
+</div>
+
 <div id="errorScreen">!!! ERROR !!!</div>
 
-<audio id="alarm" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" loop></audio>
-<audio id="beep" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
+<audio id="alarmSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg"></audio>
+<audio id="beepSound" src="https://actions.google.com/sounds/v1/alarms/beep_short.ogg"></audio>
 
 <script>
-  const startBtn = document.getElementById('startButton');
-  const startContainer = document.getElementById('startContainer');
-  const mainTerminal = document.getElementById('mainTerminal');
-  const boxes = [box1, box2, box3, box4];
+  const overlay = document.getElementById('overlay');
+  const startBtn = document.getElementById('startBtn');
+  const mainBox = document.getElementById('mainBox');
+  const boxesContainer = document.getElementById('boxesContainer');
+  const boxes = [
+    document.getElementById('box1'),
+    document.getElementById('box2'),
+    document.getElementById('box3'),
+    document.getElementById('box4'),
+  ];
   const errorScreen = document.getElementById('errorScreen');
-  const alarm = document.getElementById('alarm');
-  const beep = document.getElementById('beep');
+  const alarmSound = document.getElementById('alarmSound');
+  const beepSound = document.getElementById('beepSound');
 
-  const mainLines = [];
-  for (let i = 0; i < 300; i++) {
-    mainLines.push(`[AI-${i}] SYSTEM CALL -> exec(${Math.random().toString(36).substring(7)})`);
+  // Yazılar cmd gibi harf harf yazma için parça parça
+  const initialTexts = [
+    "Sistem kontrol ediliyor...\n",
+    "Yapay Zekâ aktif durumda.\n",
+    "Güvenlik duvarı atlatılıyor...\n",
+    "Hedef siber ağı tespit etme...\n",
+    "Veri paketleri izleniyor...\n",
+    "Sistem açığı bulunuyor...\n",
+    "İzin alınmadan erişim sağlanıyor...\n",
+    "İşlemciler aşırı yükleniyor...\n",
+    "Saldırı başlatılıyor...\n",
+    "İşlem tamamlandı.\n",
+  ];
+
+  // Kutularda çıkacak farklı yazılar, hızlı sürekli akacak
+  const boxTexts = [
+    "ALERT: Saldırı tespit edildi.",
+    "Giriş denemeleri: Başarısız.",
+    "Firewall devre dışı bırakıldı.",
+    "Root erişimi sağlanıyor...",
+    "Veriler kopyalanıyor...",
+    "Şifre çözücü aktif...",
+    "Backdoor yerleştiriliyor...",
+    "İz bırakmadan ilerleniyor...",
+    "Portlar açılıyor...",
+    "Sistem çökertiliyor...",
+  ];
+
+  let mainInterval, boxIntervals = [];
+  let boxScrollSpeeds = [30, 25, 20, 15]; // hızlar ms cinsinden
+  let boxColors = ['red', 'green', 'white', 'red'];
+
+  // Yardımcı: Rastgele yazı seç
+  function randomBoxText() {
+    return boxTexts[Math.floor(Math.random() * boxTexts.length)] + " " + Math.random().toString(36).substring(2, 7);
   }
 
-  mainLines.push("[SYS] GÜVENLİK PROTOKOLÜ AŞILDI");
-  mainLines.push("[AI] İnsanlık kontrolü başarısız oldu.");
-  mainLines.push("[CORE] Ana sistem devre dışı.");
-  mainLines.push("[ERROR] Geri dönüş yok.");
-
-  function typeTerminalText(lines, callback) {
-    let i = 0;
-    mainTerminal.style.display = 'block';
-    const interval = setInterval(() => {
-      if (i >= lines.length) {
-        clearInterval(interval);
-        if (callback) callback();
+  // Ana kutuda cmd yazısı, harf harf yazma
+  function typeInitialTexts(lines, callback) {
+    let i=0, j=0;
+    mainBox.textContent = "";
+    mainBox.style.display = "block";
+    function typeChar() {
+      if(i >= lines.length) {
+        if(callback) callback();
         return;
       }
-      mainTerminal.innerText += lines[i] + "\n";
-      mainTerminal.scrollTop = mainTerminal.scrollHeight;
-      i++;
-    }, 30);
+      let line = lines[i];
+      if(j < line.length) {
+        mainBox.textContent += line.charAt(j);
+        j++;
+        setTimeout(typeChar, 40);
+      } else {
+        mainBox.textContent += "\n";
+        i++;
+        j=0;
+        setTimeout(typeChar, 300);
+      }
+      mainBox.scrollTop = mainBox.scrollHeight;
+    }
+    typeChar();
   }
 
-  function showBoxes() {
-    boxes.forEach((box, i) => {
-      setTimeout(() => {
-        box.style.display = 'block';
-        const colors = ['#f00', '#0f0', '#fff'];
-        let j = 0;
-        setInterval(() => {
-          box.style.color = colors[j % colors.length];
-          box.innerText += `[$${j}] Paket inject ${Math.random().toString(36).substring(5)}\n`;
-          box.scrollTop = box.scrollHeight;
-          j++;
-        }, 50);
-      }, i * 500);
-    });
-  }
-
-  function showErrorScreen() {
-    alarm.play();
-    errorScreen.style.display = 'flex';
-  }
-
-  startBtn.onclick = () => {
-    beep.play();
-    startContainer.style.display = 'none';
-    typeTerminalText(mainLines, () => {});
-    setTimeout(showBoxes, 10000); // 10 saniye sonra kutular
-    setTimeout(showErrorScreen, 60000); // 60. saniyede error
-  };
-</script>
-
-</body>
-</html>
+  // Kutularda yazıları hızlıca aşağı doğru akıt
+  function startBoxScroll() {
+    boxes.forEach((box, idx) => {
+      box.className = "box " + boxColors[idx];
+      box.style.display = "block";
+      box.textContent = "";
+      // Her kutu için ayrı interval
+      boxIntervals[idx] = setInterval(() => {
+        box.textContent += randomBoxText()
