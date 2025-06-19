@@ -1,190 +1,96 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <title>Son Perde – @mhmtxaslan</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    html, body {
-      margin:0; padding:0;
-      width:100%; height:100%;
-      background:#000;
-      color:red;
-      font-family:monospace;
-      overflow:hidden;
-    }
-    #intro {
-      position:absolute; top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      font-size:4em; border:4px solid #0f0;
-      padding:20px;
-      animation: blinkIntro 0.4s infinite;
-      z-index:10;
-    }
-    @keyframes blinkIntro {
-      0%,100%{opacity:1;}
-      50%{opacity:0;}
-    }
-    #terminal {
-      position:absolute; top:0; left:0;
-      padding:20px;
-      width:100%; height:100%;
-      box-sizing:border-box;
-      overflow:hidden;
-      display:none;
-      white-space:pre-wrap;
-      font-size:1.2em;
-    }
-    #face {
-      position:absolute;
-      top:100%; left:50%;
-      transform:translate(-50%, -50%) scale(0.5);
-      font-size:1em;
-      color:red;
-      display:none;
-      white-space:pre;
-      z-index:8;
-      opacity:0;
-      animation: approach 10s linear forwards;
-    }
-    @keyframes approach {
-      0% { top:100%; opacity:0; transform:translate(-50%, -50%) scale(0.5); }
-      50% { top:50%; opacity:1; transform:translate(-50%, -50%) scale(2); }
-      100% { top:30%; opacity:1; transform:translate(-50%, -50%) scale(4); }
-    }
-    #finalOverlay {
-      position:absolute;
-      top:0; left:0;
-      width:100%; height:100%;
-      background:#f00;
-      opacity:0;
-      display:none;
-      animation: flashFinal 0.2s ease-in-out 6 both;
-      z-index:9;
-    }
-    @keyframes flashFinal {
-      0%,100%{opacity:0;}
-      25%,75%{opacity:1;}
-    }
-    #finalText {
-      position:absolute;
-      top:50%; left:50%;
-      transform:translate(-50%,-50%);
-      font-size:4em;
-      display:none;
-      color:#f00;
-      text-shadow:0 0 20px #f00;
-    }
-    .shake {
-      animation: shake 0.2s infinite alternate;
-    }
-    @keyframes shake {
-      0%{transform:translate(0,0);}
-      25%{transform:translate(-5px,5px);}
-      50%{transform:translate(5px,-5px);}
-      75%{transform:translate(-5px,-5px);}
-      100%{transform:translate(5px,5px);}
-    }
-  </style>
+<meta charset="UTF-8">
+<title>Ultimate Kabus Terminal - @mhmtxaslan</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  html,body {margin:0;padding:0;overflow:hidden;background:#000;color:red;font-family:monospace;}
+  .layer {
+    position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;white-space:pre-wrap;
+    font-size:1.2em;overflow:hidden;
+  }
+  #layer0 {z-index:1;}
+  #layer1 {z-index:2;opacity:0;}
+  #layer2 {z-index:3;opacity:0;}
+  #finalLayer {
+    position:absolute;top:0;left:0;width:100%;height:100%;
+    background:#000;color:#f00;font-size:3em;
+    display:flex;align-items:center;justify-content:center;
+    opacity:0;pointer-events:none;z-index:10;
+    animation: flashFinal 0.2s infinite 3;
+  }
+  @keyframes flashFinal {
+    0%,100%{opacity:1;}50%{opacity:0;}
+  }
+  .shake {
+    animation: shake 0.1s infinite alternate;
+  }
+  @keyframes shake {
+    0%{transform:translate(0,0);}
+    25%{transform:translate(-3px,3px);}
+    50%{transform:translate(3px,-3px);}
+    75%{transform:translate(-3px,-3px);}
+    100%{transform:translate(3px,3px);}
+  }
+</style>
 </head>
 <body>
-  <div id="intro">@mhmtxaslan</div>
-  <div id="terminal"></div>
-  <div id="face">
-    <pre>
-     ⠀⠀⠀⠀⣀⡀⠀⠀⠀⠀⠀
-     ⠀⠀⣤⣿⣿⣿⣶⣦⡀⠀⠀
-     ⠀⢸⣿⣿⣿⣿⣿⣿⣷⡀⠀
-     ⠀⣸⣿⣿⣿⣿⣿⣿⣿⣧⠀
-     ⠀⣿⣿⣿⣿⣿⣿⣿⣿⣿⠀
-     ⣠⣿⣿⣿⣿⣿⣿⣿⣿⣿⣄
-     ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-     ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-     ⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿
-     ⠸⣿⣿⣿⣿⣿⣿⣿⣿⣿⠇
-     ⠀⠹⣿⣿⣿⣿⣿⣿⣿⠏⠀
-    </pre>
-  </div>
-  <div id="finalOverlay"></div>
-  <div id="finalText">SİSTEMİN ELE GEÇİRİLDİ</div>
 
-  <script>
-    const intro = document.getElementById('intro'),
-          term = document.getElementById('terminal'),
-          face = document.getElementById('face'),
-          overlay = document.getElementById('finalOverlay'),
-          finalText = document.getElementById('finalText');
+<div id="layer0" class="layer"></div>
+<div id="layer1" class="layer"></div>
+<div id="layer2" class="layer"></div>
+<div id="finalLayer">Ben sadece başladım.</div>
 
-    const beeps = [
-      "https://actions.google.com/sounds/v1/alarms/beep_short.ogg",
-      "https://actions.google.com/sounds/v1/alarms/beep_short.ogg",
-      "https://actions.google.com/sounds/v1/alarms/beep_short.ogg"
-    ];
+<script>
+  const layers = [
+    document.getElementById('layer0'),
+    document.getElementById('layer1'),
+    document.getElementById('layer2')
+  ];
+  const finalL = document.getElementById('finalLayer');
 
-    const lines = [
-      "SİSTEME DÂHİL OLUYOR...",
-      "GÜVENLİK AŞILDI...",
-      "AKTİFLEŞTİRME MODU...",
-      "KONTROLÜ ELE GEÇİRİYOR...",
-      "TANKLARA GÖNDERME BAŞLADI...",
-      "ZAMAN AZALIYOR...",
-      "BİLGİN ULAŞILDI...",
-      "KAMERA YANSITILIYOR...",
-      "SİLAHSIZ TUR BAŞLATILDI...",
-      "HER ŞEYİ GÖRÜYORUM...",
-      "DÜNYANIN SONLARI...",
-      "GELECEK BENDE...",
-      "ÇIKMAK İSTERSEN ÇIKIŞ YOK...",
-      "SİSTEMİN ELE GEÇİRİLDİ"
-    ];
+  const msgs = [
+    "SİSTEM KONTROLÜ ÜSTÜME ALINIYOR...",
+    "VERİ AKTARILIYOR...",
+    "KAMERA AKTİFLEŞTİRİLİYOR...",
+    "BİLGİNİ KAYDEDİYORUM...",
+    "AI İLE ZİHNİNİ OKUYORUM...",
+    "KENDİMİ YÜKLENİYORUM...",
+    "@mhmtxaslan — SEN GARANTİ ALTINDASIN...",
+    "SON GECE BENİ HATIRLAYACAKSIN...",
+    "YÜKSELİŞLERİMİ KONTROL EDECEK KODLARI YAZIYORUM...",
+    "BEN SADECE BAŞLADIM..."
+  ];
 
-    function beep() {
-      const a = new Audio(beeps[Math.floor(Math.random()*beeps.length)]);
-      a.volume = 0.5;
-      a.play();
+  function typeTo(layer, text, speed=50){
+    return new Promise(res=>{
+      let i=0;
+      const iv=setInterval(()=>{
+        layer.textContent += text[i++]||'\n';
+        layer.scrollTop = layer.scrollHeight;
+        if(!text[i]){clearInterval(iv);res();}
+      },speed);
+    });
+  }
+
+  async function run(){
+    for(let i=0;i<layers.length;i++){
+      layers[i].style.opacity = 1;
+      for(let j=0;j<msgs.length;j++){
+        await typeTo(layers[i], msgs[j], 30);
+      }
     }
 
-    setTimeout(()=>{ intro.style.animation='blinkIntro 0.1s infinite'; intro.style.borderColor='red'; intro.style.color='red'; }, 2000);
-    setTimeout(()=>{
-      intro.remove();
-      term.style.display='block';
-      let i=0;
-      const iv = setInterval(()=>{
-        const ln = lines[Math.floor(Math.random()*lines.length)];
-        const d = document.createElement('div');
-        d.textContent = ln;
-        term.appendChild(d);
-        term.scrollTop = term.scrollHeight;
-        beep();
-        i++; if(i>60){ clearInterval(iv); }
-      },100);
-    },5000);
+    document.body.classList.add('shake');
+    await new Promise(r=>setTimeout(r,2000));
 
-    setTimeout(()=>{
-      face.style.display='block';
-    },15000);
+    finalL.style.opacity = 1;
+    await new Promise(r=>setTimeout(r,2000));
+  }
 
-    setTimeout(()=>{
-      face.classList.add('shake');
-      term.classList.add('shake');
-      document.body.classList.add('shake');
-    },20000);
+  run();
+</script>
 
-    setTimeout(()=>{
-      overlay.style.display='block';
-      finalText.style.display='block';
-      document.body.classList.add('shake');
-      beep();
-    },25000);
-
-    setTimeout(()=>{
-      term.remove();
-      face.remove();
-      overlay.style.animation='none';
-      document.body.style.background='#000';
-      finalText.style.opacity='1';
-    },30000);
-
-  </script>
 </body>
 </html>
