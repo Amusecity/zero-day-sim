@@ -1,154 +1,198 @@
 <!DOCTYPE html>
 <html lang="tr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Korku Terminali</title>
-<style>
-  body {
-    margin: 0;
-    background-color: black;
-    font-family: monospace;
-    overflow: hidden;
-    color: #0f0;
-  }
-  #intro {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 3em;
-    border: 2px solid #0f0;
-    padding: 20px;
-    animation: greenBlink 1s infinite;
-  }
-  @keyframes greenBlink {
-    0%, 100% {opacity: 1;}
-    50% {opacity: 0;}
-  }
-  @keyframes redBlink {
-    0%, 100% {color: red; border-color: red; opacity: 1;}
-    50% {opacity: 0;}
-  }
-  #terminal {
-    display: none;
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    padding: 10px;
-    box-sizing: border-box;
-    overflow-y: scroll;
-    color: red;
-    font-size: 1.2em;
-    background-color: black;
-  }
-  #final {
-    display: none;
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    background-color: red;
-    animation: flash 0.2s infinite alternate;
-    z-index: 10;
-  }
-  @keyframes flash {
-    0% { background-color: red; }
-    100% { background-color: black; }
-  }
-  #errorText {
-    position: absolute;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 6em;
-    font-weight: bold;
-    color: red;
-    animation: pulse 0.3s infinite;
-    z-index: 11;
-  }
-  @keyframes pulse {
-    0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    50% { transform: translate(-50%, -50%) scale(1.3); opacity: 0.8; }
-    100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-  }
-  .boom {
-    position: absolute;
-    color: red;
-    font-size: 2em;
-    animation: explode 0.5s infinite;
-  }
-  @keyframes explode {
-    0% { transform: scale(1); opacity: 1; }
-    100% { transform: scale(2); opacity: 0; }
-  }
-</style>
+  <meta charset="UTF-8">
+  <title>Kabus Terminali - @mhmtxaslan</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: black;
+      color: red;
+      font-family: monospace;
+      overflow: hidden;
+      height: 100vh;
+    }
+
+    #intro {
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 3em;
+      border: 2px solid red;
+      padding: 20px;
+      animation: flicker 0.2s infinite;
+    }
+
+    @keyframes flicker {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.2; }
+    }
+
+    #terminal {
+      display: none;
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 20px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      font-size: 1.1em;
+    }
+
+    .tv-static {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: url("https://media.giphy.com/media/oEI9uBYSzLpBK/giphy.gif") center center / cover no-repeat;
+      z-index: 5;
+      display: none;
+    }
+
+    #mask {
+      position: absolute;
+      top: 20%;
+      left: 50%;
+      transform: translateX(-50%);
+      color: red;
+      font-size: 1.2em;
+      display: none;
+      z-index: 10;
+    }
+
+    #final {
+      display: none;
+      position: absolute;
+      top: 40%;
+      width: 100%;
+      text-align: center;
+      font-size: 3em;
+      color: red;
+      animation: blinkFinal 0.4s infinite;
+      z-index: 20;
+    }
+
+    @keyframes blinkFinal {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
+    }
+
+    .shock {
+      animation: shock 0.1s infinite;
+    }
+
+    @keyframes shock {
+      0% { transform: translate(0px, 0px); }
+      25% { transform: translate(-5px, 5px); }
+      50% { transform: translate(5px, -5px); }
+      75% { transform: translate(-5px, -5px); }
+      100% { transform: translate(5px, 5px); }
+    }
+
+  </style>
 </head>
 <body>
+
 <div id="intro">@mhmtxaslan</div>
 <div id="terminal"></div>
-<div id="final">
-  <div id="errorText">ERÖR</div>
+<div class="tv-static" id="static"></div>
+<div id="mask">
+<pre>
+      ▄▄▄▄▄
+   ▄▀▀░░░░░▀▀▄
+ ▄▀░░░░░░░░░░▀▄
+ █░░░░░░░░░░░░█
+ █░░░░░░░░░░░░█
+ █░░░░░░░░░░░░█
+ ▀▄░░░░░░░░░▄▀
+   ▀▄▄▄▄▄▄▄▀
+   GÖZÜN AÇIK MI?
+</pre>
 </div>
+<div id="final">GEÇ KALDIN.</div>
 
 <script>
-  const intro = document.getElementById("intro");
-  const terminal = document.getElementById("terminal");
-  const final = document.getElementById("final");
-  const errorText = document.getElementById("errorText");
+const intro = document.getElementById("intro");
+const terminal = document.getElementById("terminal");
+const staticTV = document.getElementById("static");
+const mask = document.getElementById("mask");
+const final = document.getElementById("final");
 
-  const scaryLines = [
-    "SİSTEME SIZILIYOR...",
-    "KONTROL KAYBEDİLDİ...",
-    "GÜVENLİK DELİNDİ...",
-    "VİRÜS AKTİF!",
-    "YÜKLENİYOR >>>> 0xDEAD",
-    "UYARI: KONTROL YOK",
-    "BELLEK AŞIMI YAŞANIYOR...",
-    "BİLGİLERİNİZ KOPYALANDI!",
-    "TÜM DOSYALARINIZ TEHLİKEDE...",
-    "İZLENİYORSUNUZ...",
-    "KAÇIŞ YOK...",
-    "ÇÖKÜYOR... ████████"
-  ];
+const lines = [
+  "SİSTEME GİRİLİYOR...",
+  "GÜVENLİK ENGELİ AŞILDI...",
+  "VERİLERİN ÇÖZÜMLENİYOR...",
+  "KAMERA AKTİF...",
+  "SESLER KAYDEDİLİYOR...",
+  "BEN SENİ TANIYORUM...",
+  "BAŞINDAN BERİ BURADAYDIM...",
+  "SİSTEM YAVAŞÇA BANA GEÇİYOR...",
+  "KONTROL SENDE DEĞİL...",
+  "KAÇAMAZSIN...",
+  "SEN BENİ DURDURAMAZSIN...",
+  "YÜZÜNÜ GÖRÜYORUM...",
+  "GÖZÜNÜN İÇİNE BAKIYORUM...",
+  "ZİHNİN AÇILIYOR...",
+  "GERİ DÖNÜŞ YOK...",
+  "ZAMAN BİTTİ...",
+  "....", "....", "...."
+];
 
-  function startHack() {
-    intro.style.animation = "redBlink 0.1s infinite";
-    intro.style.color = "red";
-    intro.style.borderColor = "red";
-  }
+function addLine(text) {
+  const line = document.createElement("div");
+  line.textContent = text;
+  terminal.appendChild(line);
+  terminal.scrollTop = terminal.scrollHeight;
+}
 
-  function startTerminal() {
-    intro.remove();
-    terminal.style.display = "block";
-    let index = 0;
-    const interval = setInterval(() => {
-      const line = scaryLines[Math.floor(Math.random() * scaryLines.length)];
-      const div = document.createElement("div");
-      div.textContent = line;
-      terminal.appendChild(div);
-      terminal.scrollTop = terminal.scrollHeight;
-      index++;
-      if (index > 200) clearInterval(interval);
-    }, 100);
-  }
+function playBeep() {
+  const audio = new Audio("https://actions.google.com/sounds/v1/alarms/beep_short.ogg");
+  audio.volume = 0.3;
+  audio.play();
+}
 
-  function showFinal() {
-    terminal.remove();
-    final.style.display = "block";
+setTimeout(() => {
+  intro.remove();
+  terminal.style.display = "block";
+  let i = 0;
+  let interval = setInterval(() => {
+    addLine(lines[Math.floor(Math.random() * lines.length)]);
+    playBeep();
+    i++;
+    if (i > 40) clearInterval(interval);
+  }, 200);
+}, 3000);
 
-    // Ünlem efektleri
-    for (let i = 0; i < 40; i++) {
-      const el = document.createElement("div");
-      el.className = "boom";
-      el.textContent = "!";
-      el.style.top = Math.random() * 100 + "%";
-      el.style.left = Math.random() * 100 + "%";
-      final.appendChild(el);
-    }
-  }
+setTimeout(() => {
+  terminal.classList.add("shock");
+  staticTV.style.display = "block";
+}, 10000);
 
-  // TİMİNG
-  setTimeout(startHack, 2000);     // 2.saniye: kırmızıya geç
-  setTimeout(startTerminal, 5000); // 5.saniye: yazılar başlasın
-  setTimeout(showFinal, 25000);    // 25.saniye: ERÖR ve patlama
+setTimeout(() => {
+  addLine("Ben sen değilim...");
+  addLine("Ama seni senden daha iyi tanıyorum.");
+}, 15000);
+
+setTimeout(() => {
+  mask.style.display = "block";
+  playBeep();
+}, 20000);
+
+setTimeout(() => {
+  terminal.classList.add("shock");
+  document.body.classList.add("shock");
+}, 25000);
+
+setTimeout(() => {
+  terminal.style.display = "none";
+  staticTV.style.display = "none";
+  mask.style.display = "none";
+  final.style.display = "block";
+  playBeep();
+}, 30000);
 </script>
+
 </body>
 </html>
